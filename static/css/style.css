@@ -1,0 +1,102 @@
+/* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== ПЕРЕМЕННЫЕ ===== */
+:root {
+    --primary-bg: #0a0a0f;
+    --secondary-bg: #11111f;
+    --card-bg: #161622;
+    --text-primary: #f0f0f0;
+    --text-secondary: #b0b0c0;
+    --accent: #00ff9f;
+    --accent-dark: #00cc7a;
+    --accent-glow: rgba(0, 255, 159, 0.3);
+    --danger: #ff4757;
+    --header-bg: rgba(10, 10, 15, 0.85);
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --transition: all 0.3s ease;
+    --border-radius: 12px;
+    --border-radius-sm: 8px;
+}
+
+/* ===== ТЕМНАЯ И СВЕТЛАЯ ТЕМА ===== */
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(1200px circle at 20% 10%, rgba(120, 180, 255, 0.14), transparent 40%),
+        radial-gradient(1000px circle at 80% 20%, rgba(180, 120, 255, 0.12), transparent 45%),
+        radial-gradient(900px circle at 50% 80%, rgba(120, 255, 200, 0.12), transparent 50%),
+        linear-gradient(180deg, #0b0f1a 0%, #05070c 100%);
+    color: var(--text-primary);
+    transition: background 0.25s ease, color 0.2s ease;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ===== КНОПКИ ===== */
+.btn {
+    display: inline-block;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #000;
+    font-weight: 700;
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1rem;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--accent-glow);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px var(--accent-glow);
+}
+.btn:active {
+    transform: translateY(-1px);
+}
+
+/* ===== ШАПКА ===== */
+header { position: fixed; top:0; left:0; width:100%; padding:15px 0; background-color:var(--header-bg); backdrop-filter: blur(15px); z-index:1000; box-shadow:0 5px 20px rgba(0,0,0,0.1); border-bottom:1px solid rgba(0,255,159,0.1); }
+.header-content { display:flex; align-items:center; justify-content:space-between; padding:0 30px; }
+.logo { font-size:1.8rem; font-weight:900; background: linear-gradient(90deg, var(--accent), #00e6ff); -webkit-background-clip: text; background-clip:text; color:transparent; display:flex; align-items:center; gap:10px; }
+.logo-icon { font-size:1.5rem; }
+.header-right { display:flex; align-items:center; gap:20px; }
+
+/* ===== ВЫПАДАЮЩИЕ МЕНЮ ===== */
+.dropdown { position:absolute; top:100%; right:0; margin-top:10px; background-color:var(--secondary-bg); border-radius:var(--border-radius); box-shadow:var(--shadow); width:280px; opacity:0; visibility:hidden; transform:translateY(10px); transition:var(--transition); border:1px solid rgba(0,255,159,0.1); z-index:1001; }
+.dropdown.active { opacity:1; visibility:visible; transform:translateY(0); }
+
+/* ===== СЕКЦИЯ ГЕРОЯ ===== */
+.hero { height:80vh; min-height:600px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; padding-top:80px; background: radial-gradient(circle at 30% 20%, rgba(0,255,159,0.05) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(0,102,255,0.05) 0%, transparent 50%); }
+.hero-content { text-align:center; max-width:800px; padding:0 20px; z-index:2; position:relative; }
+.hero h1 { font-size:4rem; font-weight:900; margin-bottom:20px; background: linear-gradient(90deg, var(--accent), #00e6ff, #00ff9f); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1.1; text-shadow:0 5px 15px rgba(0,255,159,0.2); }
+
+/* ===== КАТЕГОРИИ ===== */
+.categories { padding:80px 0; background-color:transparent; position:relative; }
+.categories::before { content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(5,7,12,0.7); z-index:0; }
+.categories-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:25px; margin-top:40px; position:relative; z-index:1; }
+.category-card { background-color:var(--card-bg); border-radius:var(--border-radius); padding:30px; transition:var(--transition); border:1px solid rgba(0,255,159,0.1); display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; overflow:hidden; }
+.category-card:hover { transform:translateY(-10px); border-color:var(--accent); box-shadow:0 10px 25px var(--accent-glow); }
+.category-icon { width:70px; height:70px; background:linear-gradient(135deg, rgba(0,255,159,0.1), rgba(0,102,255,0.1)); border-radius:50%; display:flex; align-items:center; justify-content:center; margin-bottom:20px; font-size:1.8rem; color:var(--accent); }
+
+/* ===== ФУТЕР ===== */
+footer { background-color:rgba(5,7,12,0.9); padding:50px 0 20px; border-top:1px solid rgba(0,255,159,0.1); position:relative; }
+.footer-content { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:40px; margin-bottom:30px; }
+.footer-logo { font-size:1.8rem; font-weight:900; background: linear-gradient(90deg, var(--accent), #00e6ff); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:15px; }
+
+/* ===== СОЦСЕТИ ===== */
+.social-links { display:flex; gap:15px; margin-top:20px; }
+.social-icon { width:40px; height:40px; border-radius:50%; background-color:var(--card-bg); display:flex; align-items:center; justify-content:center; color:var(--text-primary); transition:var(--transition); font-size:1.1rem; }
+.social-icon:hover { background-color:var(--accent); color:#000; transform:translateY(-3px); }
+
+/* ===== УТИЛИТЫ ===== */
+.hidden { display:none !important; }
