@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для авторов и преподавателей - КиберФордж</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.9);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.95);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas матрицы на заднем плане */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 159, 0.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle, .back-to-home {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .back-to-home {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-to-home:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ===== ОСНОВНОЕ СОДЕРЖИМОЕ ===== */
+        main {
+            padding: 120px 20px 80px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* Стиль контента */
+        .authors-scroll {
+            width: 100%;
+            max-width: 900px;
+            background: 
+                radial-gradient(circle at 50% 0%, rgba(0, 255, 159, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 0% 50%, rgba(0, 102, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255, 0, 255, 0.02) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(22, 22, 34, 0.85), rgba(22, 22, 34, 0.9));
+            border-radius: var(--border-radius);
+            padding: 60px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(0, 255, 159, 0.1),
+                inset 0 0 30px rgba(0, 255, 159, 0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .authors-scroll::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2300ff9f' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        .authors-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Заголовки */
+        .authors-title {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, #00ff9f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .authors-title::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--accent);
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 255, 159, 0.2);
+            position: relative;
+        }
+
+        h2::before {
+            content: '📝';
+            position: absolute;
+            left: -30px;
+            color: var(--accent);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 25px 0 15px;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        /* Блоки с процессами */
+        .process-box {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.05), rgba(0, 102, 255, 0.05));
+            border: 2px solid rgba(0, 255, 159, 0.2);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+        }
+
+        .process-box.author {
+            border-left: 5px solid var(--accent);
+        }
+
+        .process-box.teacher {
+            border-left: 5px solid #00e6ff;
+        }
+
+        .step-list {
+            margin-top: 15px;
+        }
+
+        .step-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .step-list li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: var(--accent);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .opportunities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .opportunity-item {
+            background-color: rgba(0, 255, 159, 0.05);
+            padding: 20px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .opportunity-item:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .opportunity-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background-color: rgba(0, 255, 159, 0.1);
+            color: var(--accent);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            margin: 40px 0;
+            border: none;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .category-item {
+            background-color: rgba(0, 255, 159, 0.05);
+            padding: 12px 15px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            text-align: center;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .category-item:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.1), rgba(0, 102, 255, 0.1));
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            padding: 30px;
+            margin: 40px 0 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 40px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+        }
+
+        .light-theme footer {
+            background-color: rgba(245, 247, 250, 0.9);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        @media (max-width: 992px) {
+            .authors-scroll {
+                padding: 40px;
+            }
+            
+            .authors-title {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 1.6rem;
+            }
+            
+            .opportunities-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .authors-scroll {
+                padding: 30px 25px;
+            }
+            
+            .authors-title {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+            }
+            
+            h2::before {
+                left: -20px;
+            }
+            
+            .opportunities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .back-to-home span {
+                display: none;
+            }
+            
+            .back-to-home {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .authors-scroll {
+                padding: 25px 20px;
+            }
+            
+            .authors-title {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.2rem;
+            }
+            
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .authors-content > * {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .authors-content > *:nth-child(1) { animation-delay: 0.1s; }
+        .authors-content > *:nth-child(2) { animation-delay: 0.2s; }
+        .authors-content > *:nth-child(3) { animation-delay: 0.3s; }
+        .authors-content > *:nth-child(4) { animation-delay: 0.4s; }
+        .authors-content > *:nth-child(5) { animation-delay: 0.5s; }
+        .authors-content > *:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas для матричного эффекта -->
+    <canvas id="matrixCanvas"></canvas>
+    
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="index.html" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск по платформе...">
+            </div>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Кнопка "На главную" -->
+                <a href="index.html" class="back-to-home">
+                    <i class="fas fa-home"></i>
+                    <span>На главную</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main>
+        <div class="authors-scroll">
+            <div class="authors-content">
+                <h1 class="authors-title">Для авторов и преподавателей</h1>
+                
+                <p style="text-align: center; font-size: 1.2rem; margin-bottom: 40px;">
+                    Хотите делиться знаниями и помогать другим? Присоединяйтесь к сообществу экспертов КиберФордж!
+                </p>
+                
+                <div class="process-box author">
+                    <h2><i class="fas fa-feather-alt" style="color: var(--accent); margin-right: 10px;"></i> Стать автором</h2>
+                    <p>Станьте автором образовательного контента и делитесь своими знаниями с тысячами учеников.</p>
+                    
+                    <ol class="step-list">
+                        <li>
+                            <div class="step-number">1</div>
+                            <div>
+                                <strong>Подайте заявку через личный кабинет</strong><br>
+                                <small>Заполните анкету и расскажите о своей экспертизе</small>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">2</div>
+                            <div>
+                                <strong>Прикрепите примеры работ (опционально)</strong><br>
+                                <small>Портфолио повышает шансы на одобрение</small>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">3</div>
+                            <div>
+                                <strong>Пройдите модерацию (до 5 дней)</strong><br>
+                                <small>Наши эксперты проверят вашу заявку</small>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">4</div>
+                            <div>
+                                <strong>Получите статус автора</strong><br>
+                                <small>И возможность публиковать статьи на платформе</small>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="process-box teacher">
+                    <h2><i class="fas fa-chalkboard-teacher" style="color: #00e6ff; margin-right: 10px;"></i> Стать преподавателем</h2>
+                    <p>Создавайте собственные классы, проводите обучение и получайте обратную связь от учеников.</p>
+                    
+                    <ol class="step-list">
+                        <li>
+                            <div class="step-number">1</div>
+                            <div>
+                                <strong>Подайте документы на верификацию</strong><br>
+                                <small>Дипломы, сертификаты, подтверждающие квалификацию</small>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">2</div>
+                            <div>
+                                <strong>Пройдите собеседование</strong><br>
+                                <small>Обсудим ваши методики и подход к обучению</small>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">3</div>
+                            <div>
+                                <strong>Получите зелёную галочку</strong><br>
+                                <span class="verified-badge"><i class="fas fa-check-circle"></i> верифицированный преподаватель</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="step-number">4</div>
+                            <div>
+                                <strong>Создавайте классы до 40 человек</strong><br>
+                                <small>Разрабатывайте программы, задания и тесты</small>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+                
+                <h2>Возможности для авторов и преподавателей</h2>
+                
+                <div class="opportunities-grid">
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon"><i class="fas fa-newspaper"></i></div>
+                        <h3>Публикация статей</h3>
+                        <p>Публикуйте статьи в 6 категориях платформы</p>
+                    </div>
+                    
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon"><i class="fas fa-users"></i></div>
+                        <h3>Создание классов</h3>
+                        <p>Создавайте классы и тесты для учеников</p>
+                    </div>
+                    
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon"><i class="fas fa-certificate"></i></div>
+                        <h3>Выдача сертификатов</h3>
+                        <p>Выдавайте сертификаты об успешном завершении</p>
+                    </div>
+                    
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon"><i class="fas fa-chart-line"></i></div>
+                        <h3>Статистика и аналитика</h3>
+                        <p>Подробная статистика по вашему контенту</p>
+                    </div>
+                    
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon"><i class="fas fa-comments"></i></div>
+                        <h3>Обратная связь</h3>
+                        <p>Прямая обратная связь от сообщества</p>
+                    </div>
+                    
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon"><i class="fas fa-award"></i></div>
+                        <h3>Рейтинг экспертов</h3>
+                        <p>Попадайте в рейтинг лучших авторов платформы</p>
+                    </div>
+                </div>
+                
+                <div style="margin: 30px 0;">
+                    <h3>Категории для публикации статей:</h3>
+                    <div class="categories-grid">
+                        <div class="category-item">Кибербезопасность</div>
+                        <div class="category-item">Программирование</div>
+                        <div class="category-item">Искусственный интеллект</div>
+                        <div class="category-item">Законодательство в IT</div>
+                        <div class="category-item">Противомошенничество</div>
+                        <div class="category-item">Практические руководства</div>
+                    </div>
+                </div>
+                
+                <div class="cta-box">
+                    <h3><i class="fas fa-book" style="margin-right: 10px;"></i> Правила публикации</h3>
+                    <p>Подробные требования к контенту, процесс модерации и рекомендации по оформлению материалов описаны в разделе "Правила платформы".</p>
+                    <a href="rules.html" class="btn" style="margin-top: 15px;">
+                        <i class="fas fa-external-link-alt"></i> Читать правила платформы
+                    </a>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <p><strong>Готовы присоединиться к сообществу экспертов?</strong></p>
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
+                        <a href="register.html" class="btn pulse-animation">
+                            <i class="fas fa-user-plus"></i> Зарегистрироваться
+                        </a>
+                        <a href="index.html" class="btn-secondary">
+                            <i class="fas fa-home"></i> На главную
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Для экспертов</h3>
+                    <ul>
+                        <li><a href="for-authors.html">Для авторов и преподавателей</a></li>
+                        <li><a href="rules.html">Правила публикации</a></li>
+                        <li><a href="about.html">О проекте</a></li>
+                        <li><a href="privacy.html">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Регистрация</h3>
+                    <ul>
+                        <li><a href="register.html">Создать аккаунт</a></li>
+                        <li><a href="login.html">Войти в систему</a></li>
+                        <li><a href="index.html">Главная страница</a></li>
+                        <li><a href="for-authors.html">Стать экспертом</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023-2026 КиберФордж. Все права защищены.</p>
+                <p><small>Платформа для экспертов IT-образования. Запуск проекта: 2 января 2026 года.</small></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // Инициализация матричной анимации
+            initMatrixAnimation();
+        });
+        
+        // ===== МАТРИЧНАЯ АНИМАЦИЯ НА CANVAS =====
+        function initMatrixAnimation() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Устанавливаем размер canvas
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Символы матрицы
+            const matrixChars = '01📝✍️📚🎓🧑‍🏫👩‍🏫📖🔤📊📈📉📋✅ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~';
+            const chars = matrixChars.split('');
+            
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            
+            // Массив для отслежиния позиции капли по каждому столбцу
+            const drops = [];
+            
+            // Инициализируем капли
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+            }
+            
+            // Функция отрисовки
+            function draw() {
+                // Полупрозрачный черный фон для эффекта следа
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Цвет символов
+                ctx.fillStyle = '#00ff9f';
+                ctx.font = `${fontSize}px 'Courier New', monospace`;
+                
+                // Отрисовка символов
+                for (let i = 0; i < drops.length; i++) {
+                    // Случайный символ
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    
+                    // Рандомная яркость
+                    const brightness = 0.1 + Math.random() * 0.5;
+                    
+                    // Рисуем символ
+                    ctx.fillStyle = `rgba(0, 255, 159, ${brightness})`;
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    // Если капля достигла низа или случайно, сбрасываем её
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    // Перемещаем каплю вниз
+                    drops[i]++;
+                }
+            }
+            
+            // Запускаем анимацию
+            function animate() {
+                draw();
+                requestAnimationFrame(animate);
+            }
+            
+            // Обработчик изменения размера окна
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+            
+            // Запускаем анимацию
+            animate();
+        }
+        
+        // ===== ПЛАВНАЯ ПРОКРУТКА =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // ===== АНИМАЦИЯ ПРИ НАВЕДЕНИИ НА ЭЛЕМЕНТЫ =====
+        document.querySelectorAll('.opportunity-item, .category-item, .btn').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('pulse-animation')) {
+                    this.style.transform = 'translateY(-5px)';
+                }
+                this.style.boxShadow = '0 8px 20px var(--accent-glow)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('pulse-animation')) {
+                    this.style.transform = 'translateY(0)';
+                }
+                this.style.boxShadow = 'none';
+            });
+        });
+        
+        // ===== ОБРАБОТКА ПОИСКА =====
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                alert('Поиск по платформе будет реализован в ближайших обновлениях. Сейчас вы можете ознакомиться с возможностями для авторов на этой странице.');
+                this.value = '';
+            }
+        });
+        
+        // ===== ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ =====
+        document.querySelectorAll('.step-number').forEach((step, index) => {
+            step.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.2)';
+                this.style.boxShadow = '0 0 15px var(--accent-glow)';
+            });
+            
+            step.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

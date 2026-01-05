@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ - Часто задаваемые вопросы - КиберФордж</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.9);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.95);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas матрицы на заднем плане */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 159, 0.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle, .back-to-home {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .back-to-home {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-to-home:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ===== ОСНОВНОЕ СОДЕРЖИМОЕ ===== */
+        main {
+            padding: 120px 20px 80px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* Стиль контента */
+        .faq-scroll {
+            width: 100%;
+            max-width: 900px;
+            background: 
+                radial-gradient(circle at 50% 0%, rgba(0, 255, 159, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 0% 50%, rgba(0, 102, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255, 0, 255, 0.02) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(22, 22, 34, 0.85), rgba(22, 22, 34, 0.9));
+            border-radius: var(--border-radius);
+            padding: 60px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(0, 255, 159, 0.1),
+                inset 0 0 30px rgba(0, 255, 159, 0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .faq-scroll::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2300ff9f' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        .faq-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Заголовки */
+        .faq-title {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, #00ff9f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .faq-title::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .faq-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--accent);
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 255, 159, 0.2);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 25px 0 15px;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        /* Аккордеон */
+        .faq-accordion {
+            margin: 30px 0;
+        }
+
+        .faq-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .faq-item.active {
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px var(--accent-glow);
+            background-color: rgba(0, 255, 159, 0.05);
+        }
+
+        .faq-question {
+            width: 100%;
+            padding: 20px;
+            background-color: transparent;
+            border: none;
+            text-align: left;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .faq-question:hover {
+            background-color: rgba(0, 255, 159, 0.05);
+        }
+
+        .faq-question .icon {
+            color: var(--accent);
+            font-size: 1.2rem;
+            transition: var(--transition);
+            transform: rotate(0deg);
+        }
+
+        .faq-item.active .faq-question .icon {
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .faq-answer-content {
+            padding: 0 20px 20px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .faq-answer-content p {
+            margin-bottom: 15px;
+        }
+
+        .faq-answer-content ul, .faq-answer-content ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .faq-answer-content li {
+            margin-bottom: 8px;
+        }
+
+        .info-box {
+            background-color: rgba(0, 255, 159, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+        }
+
+        .warning-box {
+            background-color: rgba(255, 71, 87, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+        }
+
+        .faq-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 25px 0;
+            justify-content: center;
+        }
+
+        .faq-category {
+            padding: 8px 16px;
+            background-color: rgba(0, 255, 159, 0.1);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: 20px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .faq-category:hover,
+        .faq-category.active {
+            background-color: rgba(0, 255, 159, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .faq-search {
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .faq-search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .faq-search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .faq-search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            margin: 40px 0;
+            border: none;
+        }
+
+        .contact-support {
+            text-align: center;
+            margin: 40px 0 20px;
+            padding: 30px;
+            background-color: rgba(0, 102, 255, 0.1);
+            border-radius: var(--border-radius);
+            border: 1px solid rgba(0, 102, 255, 0.2);
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 40px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+        }
+
+        .light-theme footer {
+            background-color: rgba(245, 247, 250, 0.9);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        @media (max-width: 992px) {
+            .faq-scroll {
+                padding: 40px;
+            }
+            
+            .faq-title {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .faq-scroll {
+                padding: 30px 25px;
+            }
+            
+            .faq-title {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .back-to-home span {
+                display: none;
+            }
+            
+            .back-to-home {
+                padding: 8px;
+            }
+            
+            .faq-categories {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .faq-scroll {
+                padding: 25px 20px;
+            }
+            
+            .faq-title {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.2rem;
+            }
+            
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .faq-question {
+                padding: 15px;
+                font-size: 1rem;
+            }
+            
+            .faq-answer-content {
+                padding: 0 15px 15px;
+            }
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .faq-content > * {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .faq-content > *:nth-child(1) { animation-delay: 0.1s; }
+        .faq-content > *:nth-child(2) { animation-delay: 0.2s; }
+        .faq-content > *:nth-child(3) { animation-delay: 0.3s; }
+        .faq-content > *:nth-child(4) { animation-delay: 0.4s; }
+        .faq-content > *:nth-child(5) { animation-delay: 0.5s; }
+        .faq-content > *:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <!-- Canvas для матричного эффекта -->
+    <canvas id="matrixCanvas"></canvas>
+    
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="index.html" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск по платформе...">
+            </div>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Кнопка "На главную" -->
+                <a href="index.html" class="back-to-home">
+                    <i class="fas fa-home"></i>
+                    <span>На главную</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main>
+        <div class="faq-scroll">
+            <div class="faq-content">
+                <h1 class="faq-title">Часто задаваемые вопросы</h1>
+                <p class="faq-subtitle">Найдите ответы на самые популярные вопросы о платформе КиберФордж</p>
+                
+                <div class="faq-search">
+                    <i class="fas fa-search faq-search-icon"></i>
+                    <input type="text" class="faq-search-input" id="faqSearch" placeholder="Поиск по вопросам...">
+                </div>
+                
+                <div class="faq-categories">
+                    <div class="faq-category active" data-category="all">Все вопросы</div>
+                    <div class="faq-category" data-category="registration">Регистрация</div>
+                    <div class="faq-category" data-category="articles">Статьи</div>
+                    <div class="faq-category" data-category="certificates">Сертификаты</div>
+                    <div class="faq-category" data-category="classes">Классы</div>
+                    <div class="faq-category" data-category="technical">Технические</div>
+                </div>
+                
+                <div class="faq-accordion">
+                    <!-- Вопрос 1 -->
+                    <div class="faq-item active" data-categories="registration">
+                        <button class="faq-question">
+                            Как зарегистрироваться на платформе?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Для регистрации на платформе КиберФордж:</p>
+                                <ol>
+                                    <li>Перейдите на <a href="register.html">страницу регистрации</a></li>
+                                    <li>Заполните все обязательные поля: email, имя пользователя, пароль</li>
+                                    <li>Прочитайте и примите условия использования и политику конфиденциальности</li>
+                                    <li>Нажмите кнопку "Создать аккаунт"</li>
+                                    <li>Подтвердите email, перейдя по ссылке в письме</li>
+                                </ol>
+                                <div class="info-box">
+                                    <p><strong>Важно:</strong> Каждый пользователь может иметь только один аккаунт. Регистрация с фейковыми данными запрещена.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 2 -->
+                    <div class="faq-item" data-categories="articles">
+                        <button class="faq-question">
+                            Как стать автором статей?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Чтобы стать автором на КиберФордж:</p>
+                                <ol>
+                                    <li>Зарегистрируйтесь на платформе</li>
+                                    <li>Перейдите в личный кабинет</li>
+                                    <li>В разделе "Стать автором" подайте заявку</li>
+                                    <li>Приложите примеры ваших работ или ссылки на публикации</li>
+                                    <li>Пройти собеседование с модератором (при необходимости)</li>
+                                </ol>
+                                <p>Рассмотрение заявки занимает до 5 рабочих дней. После одобрения вы получите доступ к публикации статей и сможете участвовать в программах для авторов.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 3 -->
+                    <div class="faq-item" data-categories="certificates">
+                        <button class="faq-question">
+                            Как получить сертификат о прохождении курса?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Сертификаты выдаются автоматически при выполнении следующих условий:</p>
+                                <ul>
+                                    <li>Успешное прохождение всех модулей курса</li>
+                                    <li>Сдача финального теста с результатом не менее 80%</li>
+                                    <li>Выполнение практических заданий (если они предусмотрены курсом)</li>
+                                </ul>
+                                <p>После выполнения всех требований сертификат автоматически появится в вашем личном кабинете в разделе "Мои сертификаты".</p>
+                                <div class="info-box">
+                                    <p>Каждый сертификат имеет уникальный ID для проверки подлинности. Вы можете поделиться им в социальных сетях или добавить в портфолио.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 4 -->
+                    <div class="faq-item" data-categories="registration">
+                        <button class="faq-question">
+                            Сколько стоит обучение на платформе?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p><strong>Платформа КиберФордж полностью бесплатна для всех пользователей.</strong></p>
+                                <p>Мы придерживаемся принципа доступного образования и не взимаем плату за:</p>
+                                <ul>
+                                    <li>Регистрацию и создание аккаунта</li>
+                                    <li>Доступ к статьям и образовательным материалам</li>
+                                    <li>Участие в классах и курсах</li>
+                                    <li>Получение сертификатов</li>
+                                    <li>Использование всех функций платформы</li>
+                                </ul>
+                                <p>Проект развивается на энтузиазме сообщества и поддерживается добровольными пожертвованиями.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 5 -->
+                    <div class="faq-item" data-categories="classes">
+                        <button class="faq-question">
+                            Как верифицировать аккаунт преподавателя?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Для получения статуса верифицированного преподавателя необходимо:</p>
+                                <ol>
+                                    <li>Иметь законченное высшее образование в IT-сфере или подтверждённый профессиональный опыт</li>
+                                    <li>Предоставить документы, подтверждающие квалификацию</li>
+                                    <li>Пройти собеседование с представителями платформы</li>
+                                    <li>Согласиться с правилами преподавателей и профессиональной этикой</li>
+                                </ol>
+                                <p>После верификации вы получите зелёную галочку в профиле и сможете создавать классы, разрабатывать курсы и выдавать сертификаты.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 6 -->
+                    <div class="faq-item" data-categories="classes">
+                        <button class="faq-question">
+                            Как создавать классы?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Создание классов доступно только верифицированным преподавателям:</p>
+                                <ol>
+                                    <li>В личном кабинете перейдите в раздел "Мои классы"</li>
+                                    <li>Нажмите "Создать новый класс"</li>
+                                    <li>Заполните информацию: название, описание, тематика, цели</li>
+                                    <li>Установите максимальное количество участников (до 40 человек)</li>
+                                    <li>Определите правила и расписание занятий</li>
+                                    <li>Загрузите учебные материалы</li>
+                                </ol>
+                                <p>После создания класса вы сможете приглашать участников и начать обучение.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 7 -->
+                    <div class="faq-item" data-categories="articles">
+                        <button class="faq-question">
+                            Как добавить статью на модерацию?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Процесс публикации статьи:</p>
+                                <ol>
+                                    <li>В личном кабинете выберите "Добавить статью"</li>
+                                    <li>Заполните заголовок, выберите категорию</li>
+                                    <li>Напишите текст статьи (минимум 1000 знаков)</li>
+                                    <li>Отформатируйте текст, добавьте изображения</li>
+                                    <li>Укажите источники информации (если использовались)</li>
+                                    <li>Нажмите "Отправить на модерацию"</li>
+                                </ol>
+                                <p>Модерация занимает до 48 часов. Вы получите уведомление о решении. Если статья отклонена, вы можете доработать её и отправить снова.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 8 -->
+                    <div class="faq-item" data-categories="technical">
+                        <button class="faq-question">
+                            Что делать, если я забыл пароль?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Если вы забыли пароль:</p>
+                                <ol>
+                                    <li>На странице входа нажмите "Забыли пароль?"</li>
+                                    <li>Введите email, указанный при регистрации</li>
+                                    <li>Проверьте почту и перейдите по ссылке в письме</li>
+                                    <li>Придумайте и подтвердите новый пароль</li>
+                                </ol>
+                                <div class="warning-box">
+                                    <p><strong>Важно:</strong> Ссылка для восстановления пароля действительна в течение 24 часов. Если письмо не пришло, проверьте папку "Спам".</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 9 -->
+                    <div class="faq-item" data-categories="technical">
+                        <button class="faq-question">
+                            Как работает система рейтинга?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Система рейтинга учитывает вашу активность на платформе:</p>
+                                <ul>
+                                    <li><strong>Чтение статей</strong> - +1 балл за каждую прочитанную статью</li>
+                                    <li><strong>Публикации</strong> - +10 баллов за каждую одобренную статью</li>
+                                    <li><strong>Комментарии</strong> - +2 балла за конструктивный комментарий</li>
+                                    <li><strong>Завершение курсов</strong> - +50 баллов за каждый пройденный курс</li>
+                                    <li><strong>Активность в классах</strong> - +5 баллов за участие в обсуждениях</li>
+                                </ul>
+                                <p>Рейтинг отображается в вашем профиле и влияет на доступ к некоторым функциям платформы.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 10 -->
+                    <div class="faq-item" data-categories="articles">
+                        <button class="faq-question">
+                            Какие есть требования к статьям?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Основные требования к статьям:</p>
+                                <ul>
+                                    <li><strong>Уникальность</strong> - контент должен быть авторским</li>
+                                    <li><strong>Объём</strong> - не менее 1000 знаков без пробелов</li>
+                                    <li><strong>Структура</strong> - наличие заголовков, подзаголовков, списков</li>
+                                    <li><strong>Грамотность</strong> - отсутствие орфографических и грамматических ошибок</li>
+                                    <li><strong>Актуальность</strong> - информация должна быть современной и проверенной</li>
+                                    <li><strong>Категория</strong> - статья должна соответствовать тематике платформы</li>
+                                </ul>
+                                <p>Статьи, не соответствующие требованиям, отправляются на доработку.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 11 -->
+                    <div class="faq-item" data-categories="classes">
+                        <button class="faq-question">
+                            Как принять участие в вебинаре?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Участие в вебинарах:</p>
+                                <ol>
+                                    <li>В разделе "Вебинары" выберите предстоящее мероприятие</li>
+                                    <li>Нажмите "Записаться на вебинар"</li>
+                                    <li>Дождитесь уведомления о начале (за 1 час до старта)</li>
+                                    <li>За 5 минут до начала перейдите по ссылке из уведомления</li>
+                                </ol>
+                                <p>Вебинары проходят в реальном времени с возможностью задавать вопросы. Записи вебинаров доступны участникам в течение 7 дней после проведения.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 12 -->
+                    <div class="faq-item" data-categories="technical">
+                        <button class="faq-question">
+                            Как связаться с администрацией?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Есть несколько способов связи с администрацией:</p>
+                                <ol>
+                                    <li><strong>Система обращений</strong> - в личном кабинете, раздел "Обращения"</li>
+                                    <li><strong>Email</strong> - support@cyberforge.red1dark.ru</li>
+                                    <li><strong>Telegram</strong> - для срочных вопросов (доступно после регистрации)</li>
+                                </ol>
+                                <p>Время ответа на обращения:</p>
+                                <ul>
+                                    <li>Первичный ответ - в течение 24 часов</li>
+                                    <li>Простые вопросы - до 72 часов</li>
+                                    <li>Сложные обращения - до 7 рабочих дней</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 13 -->
+                    <div class="faq-item" data-categories="technical">
+                        <button class="faq-question">
+                            Как отозвать согласие на обработку персональных данных?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Чтобы отозвать согласие на обработку персональных данных:</p>
+                                <ol>
+                                    <li>Перейдите в личный кабинет</li>
+                                    <li>В разделе "Настройки" выберите "Конфиденциальность"</li>
+                                    <li>Нажмите "Отозвать согласие на обработку данных"</li>
+                                    <li>Подтвердите действие</li>
+                                </ol>
+                                <div class="warning-box">
+                                    <p><strong>Важно:</strong> После отзыва согласия ваш аккаунт будет деактивирован, а данные удалены в течение 30 дней (кроме случаев, когда хранение требуется по закону).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 14 -->
+                    <div class="faq-item" data-categories="technical">
+                        <button class="faq-question">
+                            Как удалить свой аккаунт?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Удаление аккаунта возможно двумя способами:</p>
+                                
+                                <h4>Через личный кабинет:</h4>
+                                <ol>
+                                    <li>Перейдите в "Настройки аккаунта"</li>
+                                    <li>Выберите "Удалить аккаунт"</li>
+                                    <li>Подтвердите паролем</li>
+                                    <li>Укажите причину удаления</li>
+                                </ol>
+                                
+                                <h4>Через обращение к администрации:</h4>
+                                <p>Отправьте запрос через систему обращений с темой "Удаление аккаунта".</p>
+                                
+                                <div class="warning-box">
+                                    <p><strong>Внимание:</strong> Удаление аккаунта необратимо. Будут удалены все ваши данные, статьи, сертификаты и история активности. Процесс занимает до 30 дней.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Вопрос 15 -->
+                    <div class="faq-item" data-categories="technical">
+                        <button class="faq-question">
+                            Как поддержать проект?
+                            <span class="icon">+</span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="faq-answer-content">
+                                <p>Поддержать проект КиберФордж можно несколькими способами:</p>
+                                
+                                <h4>Финансовая поддержка:</h4>
+                                <ul>
+                                    <li>Криптовалюта (BTC, ETH, USDT, TON)</li>
+                                    <li>Telegram Stars (скоро будет доступно)</li>
+                                    <li>ЮMoney и другие способы (в разработке)</li>
+                                </ul>
+                                
+                                <h4>Нематериальная поддержка:</h4>
+                                <ul>
+                                    <li>Публикация качественных статей</li>
+                                    <li>Помощь в модерации контента</li>
+                                    <li>Перевод материалов на другие языки</li>
+                                    <li>Участие в тестировании новых функций</li>
+                                    <li>Продвижение платформы в соцсетях</li>
+                                </ul>
+                                
+                                <p>Подробнее о поддержке проекта читайте на странице <a href="about.html">"О проекте"</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-support">
+                    <h3>Не нашли ответ на свой вопрос?</h3>
+                    <p>Свяжитесь с нашей службой поддержки, и мы поможем вам в течение 24 часов.</p>
+                    <a href="index.html" class="btn" style="margin-top: 15px;">
+                        <i class="fas fa-headset"></i> Связаться с поддержкой
+                    </a>
+                </div>
+                
+                <hr class="section-divider">
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <p><small>Последнее обновление FAQ: 2 января 2026 года</small></p>
+                    <p><small>Ответы на вопросы могут обновляться по мере развития платформы.</small></p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Полезные ссылки</h3>
+                    <ul>
+                        <li><a href="index.html">Главная страница</a></li>
+                        <li><a href="about.html">О проекте</a></li>
+                        <li><a href="rules.html">Правила платформы</a></li>
+                        <li><a href="privacy.html">Политика конфиденциальности</a></li>
+                        <li><a href="faq.html">Часто задаваемые вопросы</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Регистрация</h3>
+                    <ul>
+                        <li><a href="register.html">Создать аккаунт</a></li>
+                        <li><a href="login.html">Войти в систему</a></li>
+                        <li><a href="#">Для преподавателей</a></li>
+                        <li><a href="#">Для авторов</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023-2026 КиберФордж. Все права защищены.</p>
+                <p><small>Образовательная платформа для киберспециалистов. Запуск проекта: 2 января 2026 года.</small></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // Инициализация матричной анимации
+            initMatrixAnimation();
+            
+            // Открываем первый вопрос по умолчанию
+            const firstQuestion = document.querySelector('.faq-item');
+            if (firstQuestion) {
+                firstQuestion.classList.add('active');
+            }
+        });
+        
+        // ===== МАТРИЧНАЯ АНИМАЦИЯ НА CANVAS =====
+        function initMatrixAnimation() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Устанавливаем размер canvas
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Символы матрицы
+            const matrixChars = '01❓❔⁉️❕❗️💡🔍📖📚📝📋📎🔗🖇️ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~';
+            const chars = matrixChars.split('');
+            
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            
+            // Массив для отслежиния позиции капли по каждому столбцу
+            const drops = [];
+            
+            // Инициализируем капли
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+            }
+            
+            // Функция отрисовки
+            function draw() {
+                // Полупрозрачный черный фон для эффекта следа
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Цвет символов
+                ctx.fillStyle = '#00ff9f';
+                ctx.font = `${fontSize}px 'Courier New', monospace`;
+                
+                // Отрисовка символов
+                for (let i = 0; i < drops.length; i++) {
+                    // Случайный символ
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    
+                    // Рандомная яркость
+                    const brightness = 0.1 + Math.random() * 0.5;
+                    
+                    // Рисуем символ
+                    ctx.fillStyle = `rgba(0, 255, 159, ${brightness})`;
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    // Если капля достигла низа или случайно, сбрасываем её
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    // Перемещаем каплю вниз
+                    drops[i]++;
+                }
+            }
+            
+            // Запускаем анимацию
+            function animate() {
+                draw();
+                requestAnimationFrame(animate);
+            }
+            
+            // Обработчик изменения размера окна
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+            
+            // Запускаем анимацию
+            animate();
+        }
+        
+        // ===== АККОРДЕОН =====
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Закрываем все вопросы
+                document.querySelectorAll('.faq-item').forEach(faqItem => {
+                    faqItem.classList.remove('active');
+                });
+                
+                // Если вопрос не был активен, открываем его
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+        
+        // ===== ПОИСК ПО ВОПРОСАМ =====
+        const faqSearch = document.getElementById('faqSearch');
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqSearch.addEventListener('input', () => {
+            const searchTerm = faqSearch.value.toLowerCase();
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer-content').textContent.toLowerCase();
+                
+                if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        
+        // ===== ФИЛЬТРАЦИЯ ПО КАТЕГОРИЯМ =====
+        const faqCategories = document.querySelectorAll('.faq-category');
+        
+        faqCategories.forEach(category => {
+            category.addEventListener('click', () => {
+                // Убираем активный класс у всех категорий
+                faqCategories.forEach(cat => cat.classList.remove('active'));
+                // Добавляем активный класс текущей категории
+                category.classList.add('active');
+                
+                const selectedCategory = category.getAttribute('data-category');
+                
+                faqItems.forEach(item => {
+                    const itemCategories = item.getAttribute('data-categories').split(' ');
+                    
+                    if (selectedCategory === 'all' || itemCategories.includes(selectedCategory)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // ===== ОБРАБОТКА ПОИСКА В ШАПКЕ =====
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                alert('Поиск по платформе будет реализован в ближайших обновлениях. Сейчас вы можете использовать поиск по FAQ выше.');
+                this.value = '';
+            }
+        });
+        
+        // ===== АНИМАЦИЯ ПРИ НАВЕДЕНИИ НА ЭЛЕМЕНТЫ =====
+        document.querySelectorAll('.faq-category, .btn').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+                this.style.boxShadow = '0 6px 15px var(--accent-glow)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    </script>
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

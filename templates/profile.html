@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль @CyberHacker - КиберФордж</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.85);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.92);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 255, 159, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(0, 102, 255, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 50% 80%, rgba(255, 0, 255, 0.02) 0%, transparent 20%);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 159, 0.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle, .notification-icon, .avatar {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .notification-icon {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--header-bg);
+        }
+
+        .avatar img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .avatar:hover img {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ===== ВЫПАДАЮЩИЕ МЕНЮ ===== */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            z-index: 1001;
+        }
+
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 255, 159, 0.05);
+            color: var(--accent);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .notification-dropdown {
+            right: -10px;
+        }
+
+        .avatar-dropdown {
+            right: 0;
+        }
+
+        /* ===== ОСНОВНОЕ СОДЕРЖИМОЕ ===== */
+        main {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+        }
+
+        .profile-container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Блок профиля */
+        .profile-header {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 40px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+        }
+
+        .avatar-large {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(0, 255, 159, 0.3);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .profile-name {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .username {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.5rem;
+            background-color: rgba(0, 255, 159, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 159, 0.2);
+        }
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 71, 87, 0.1);
+            color: var(--danger);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius-sm);
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            transition: var(--transition);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Достижения */
+        .achievements-section {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+        }
+
+        .achievement-item {
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            transition: var(--transition);
+        }
+
+        .achievement-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
+        .achievement-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+
+        .achievement-name {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        /* Вкладки */
+        .tabs-container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+            background-color: var(--secondary-bg);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: var(--accent);
+            background-color: rgba(0, 255, 159, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+        }
+
+        .tab-content {
+            padding: 40px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Контент вкладок */
+        .articles-grid, .certificates-grid, .classes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .article-card, .certificate-card, .class-card {
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            transition: var(--transition);
+        }
+
+        .article-card:hover, .certificate-card:hover, .class-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px var(--accent-glow);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .card-date {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .card-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .status-published {
+            background-color: rgba(0, 255, 159, 0.1);
+            color: var(--accent);
+        }
+
+        .status-draft {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: var(--secondary-bg);
+            padding: 50px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .social-icon:hover {
+            background-color: var(--accent);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--secondary-bg);
+            padding: 10px 0;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            z-index: 999;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 8px 15px;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+
+        .mobile-nav-item.active,
+        .mobile-nav-item:hover {
+            color: var(--accent);
+            background-color: rgba(0, 255, 159, 0.05);
+        }
+
+        .mobile-nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 992px) {
+            .profile-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 30px;
+            }
+            
+            .avatar-large {
+                width: 150px;
+                height: 150px;
+                margin: 0 auto;
+            }
+            
+            .profile-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .achievements-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .profile-header {
+                padding: 30px 25px;
+            }
+            
+            .profile-name {
+                font-size: 2rem;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .tabs-header {
+                flex-direction: column;
+            }
+            
+            .tab-btn {
+                padding: 15px;
+                border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+            }
+            
+            .tab-btn.active::after {
+                width: 3px;
+                height: 100%;
+                left: 0;
+                top: 0;
+            }
+            
+            .tab-content {
+                padding: 25px;
+            }
+            
+            .mobile-bottom-nav {
+                display: block;
+            }
+            
+            footer {
+                padding-bottom: 70px;
+            }
+            
+            .articles-grid, .certificates-grid, .classes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .achievements-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .theme-toggle, .notification-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="index.html" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск курсов, статей...">
+            </div>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Уведомления -->
+                <div class="notification-icon" id="notificationIcon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                    <!-- Выпадающее меню уведомлений -->
+                    <div class="dropdown notification-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-bell"></i> Уведомления
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-book"></i>
+                            <span>Новый курс по кибербезопасности доступен</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Ваш сертификат готов к выдаче</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-comment"></i>
+                            <span>Новый комментарий в вашей статье</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Завтра вебинар по теме "AI в cybersecurity"</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-eye"></i>
+                            <span>Показать все уведомления</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Аватар и меню пользователя -->
+                <div class="avatar" id="avatar">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Аватар пользователя">
+                    <!-- Выпадающее меню пользователя -->
+                    <div class="dropdown avatar-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-user"></i> Алексей Киберов
+                        </div>
+                        <a href="profile.html" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-newspaper"></i>
+                            <span>Мои статьи</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-users"></i>
+                            <span>Мои классы</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Мои сертификаты</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выход</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main>
+        <div class="container profile-container">
+            <!-- Блок профиля -->
+            <div class="profile-header">
+                <div>
+                    <img src="https://i.pravatar.cc/300?img=32" alt="Аватар" class="avatar-large">
+                </div>
+                
+                <div class="profile-info">
+                    <h1 class="profile-name">
+                        Алексей Киберов
+                        <span class="username">@CyberHacker</span>
+                    </h1>
+                    
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div class="verified-badge">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Верифицированный преподаватель</span>
+                        </div>
+                        <div class="status-badge">
+                            <i class="fas fa-circle"></i>
+                            <span>Активен</span>
+                        </div>
+                    </div>
+                    
+                    <p style="color: var(--text-secondary); margin-top: 10px;">
+                        Специалист по кибербезопасности. Преподаю с 2024 года. 
+                        Автор курса "Основы криптографии для начинающих".
+                    </p>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">127</div>
+                            <div class="stat-label">Статей</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">Сертификатов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">8</div>
+                            <div class="stat-label">Классов</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">Дней обучения</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Достижения -->
+            <div class="achievements-section">
+                <h2 class="section-title">
+                    <i class="fas fa-trophy"></i>
+                    Достижения
+                </h2>
+                <div class="achievements-grid">
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-pen-fancy"></i>
+                        </div>
+                        <div class="achievement-name">Автор месяца</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="achievement-name">100+ статей</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="achievement-name">Мастер-класс</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="achievement-name">Эксперт безопасности</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="achievement-name">Сообщество</div>
+                    </div>
+                    <div class="achievement-item">
+                        <div class="achievement-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="achievement-name">Разработчик</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Вкладки -->
+            <div class="tabs-container">
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="articles">
+                        <i class="fas fa-newspaper"></i> Статьи пользователя
+                    </button>
+                    <button class="tab-btn" data-tab="certificates">
+                        <i class="fas fa-certificate"></i> Сертификаты
+                    </button>
+                    <button class="tab-btn" data-tab="classes">
+                        <i class="fas fa-users"></i> Классы
+                    </button>
+                </div>
+                
+                <!-- Вкладка Статьи -->
+                <div class="tab-content active" id="articles-tab">
+                    <div class="articles-grid">
+                        <div class="article-card">
+                            <div class="card-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3 class="card-title">Основы шифрования данных</h3>
+                            <div class="card-date">Опубликовано: 15.12.2025</div>
+                            <div class="card-status status-published">Опубликовано</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Полное руководство по базовым алгоритмам шифрования для начинающих.
+                            </p>
+                        </div>
+                        
+                        <div class="article-card">
+                            <div class="card-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <h3 class="card-title">Python для анализа безопасности</h3>
+                            <div class="card-date">Опубликовано: 10.12.2025</div>
+                            <div class="card-status status-published">Опубликовано</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Как использовать Python для автоматизации тестирования на проникновение.
+                            </p>
+                        </div>
+                        
+                        <div class="article-card">
+                            <div class="card-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h3 class="card-title">Защита от фишинга</h3>
+                            <div class="card-date">Черновик</div>
+                            <div class="card-status status-draft">Черновик</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Практические советы по защите от мошеннических писем и сайтов.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Вкладка Сертификаты -->
+                <div class="tab-content" id="certificates-tab">
+                    <div class="certificates-grid">
+                        <div class="certificate-card">
+                            <div class="card-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h3 class="card-title">Кибербезопасность для начинающих</h3>
+                            <div class="card-date">Получен: 10.12.2025</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Сертификат об успешном прохождении базового курса по кибербезопасности.
+                            </p>
+                            <button class="btn" style="margin-top: 15px; width: 100%;">
+                                <i class="fas fa-eye"></i> Просмотреть
+                            </button>
+                        </div>
+                        
+                        <div class="certificate-card">
+                            <div class="card-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <h3 class="card-title">Сетевая безопасность</h3>
+                            <div class="card-date">Получен: 05.12.2025</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Сертификат по защите сетевой инфраструктуры и обнаружению вторжений.
+                            </p>
+                            <button class="btn" style="margin-top: 15px; width: 100%;">
+                                <i class="fas fa-eye"></i> Просмотреть
+                            </button>
+                        </div>
+                        
+                        <div class="certificate-card">
+                            <div class="card-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3 class="card-title">AI в кибербезопасности</h3>
+                            <div class="card-date">Получен: 01.12.2025</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Применение искусственного интеллекта для обнаружения угроз.
+                            </p>
+                            <button class="btn" style="margin-top: 15px; width: 100%;">
+                                <i class="fas fa-eye"></i> Просмотреть
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Вкладка Классы -->
+                <div class="tab-content" id="classes-tab">
+                    <div class="classes-grid">
+                        <div class="class-card">
+                            <div class="card-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <h3 class="card-title">Основы криптографии</h3>
+                            <div class="card-date">Преподаватель</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Ведущий преподаватель. Участников: 32/40
+                            </p>
+                            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                                <button class="btn" style="flex: 1;">
+                                    <i class="fas fa-door-open"></i> Войти
+                                </button>
+                                <button class="btn-secondary" style="flex: 1;">
+                                    <i class="fas fa-cog"></i> Управление
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="class-card">
+                            <div class="card-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3 class="card-title">Продвинутый Python</h3>
+                            <div class="card-date">Ученик</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Активный участник. Прогресс: 75%
+                            </p>
+                            <button class="btn" style="margin-top: 15px; width: 100%;">
+                                <i class="fas fa-door-open"></i> Продолжить обучение
+                            </button>
+                        </div>
+                        
+                        <div class="class-card">
+                            <div class="card-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h3 class="card-title">Законы в IT</h3>
+                            <div class="card-date">Ученик</div>
+                            <p style="margin-top: 15px; color: var(--text-secondary); font-size: 0.9rem;">
+                                Активный участник. Прогресс: 45%
+                            </p>
+                            <button class="btn" style="margin-top: 15px; width: 100%;">
+                                <i class="fas fa-door-open"></i> Продолжить обучение
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Быстрые ссылки</h3>
+                    <ul>
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="about.html">О проекте</a></li>
+                        <li><a href="rules.html">Правила</a></li>
+                        <li><a href="privacy.html">Конфиденциальность</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Профиль</h3>
+                    <ul>
+                        <li><a href="profile.html">Мой профиль</a></li>
+                        <li><a href="#">Настройки</a></li>
+                        <li><a href="#">Мои статьи</a></li>
+                        <li><a href="#">Мои сертификаты</a></li>
+                        <li><a href="#">Мои классы</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 КиберФордж. Все права защищены. <a href="privacy.html" style="color: var(--accent);">Политика конфиденциальности</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Мобильное нижнее меню -->
+    <nav class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="index.html" class="mobile-nav-item">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="#" class="mobile-nav-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Статьи</span>
+            </a>
+            <a href="#" class="mobile-nav-item">
+                <i class="fas fa-users"></i>
+                <span>Классы</span>
+            </a>
+            <a href="#" class="mobile-nav-item search-mobile">
+                <i class="fas fa-search"></i>
+                <span>Поиск</span>
+            </a>
+            <a href="profile.html" class="mobile-nav-item active">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        });
+        
+        // ===== ВЫПАДАЮЩИЕ МЕНЮ =====
+        const notificationIcon = document.getElementById('notificationIcon');
+        const avatar = document.getElementById('avatar');
+        const notificationDropdown = notificationIcon.querySelector('.dropdown');
+        const avatarDropdown = avatar.querySelector('.dropdown');
+        
+        // Открытие/закрытие меню уведомлений
+        notificationIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Открытие/закрытие меню пользователя
+        avatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('active');
+            notificationDropdown.classList.remove('active');
+        });
+        
+        // Закрытие всех меню при клике вне их
+        document.addEventListener('click', () => {
+            notificationDropdown.classList.remove('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Предотвращение закрытия при клике внутри меню
+        notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
+        avatarDropdown.addEventListener('click', (e) => e.stopPropagation());
+        
+        // ===== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК =====
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                
+                // Удаляем активный класс у всех кнопок и контента
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Добавляем активный класс текущей кнопке и соответствующему контенту
+                btn.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // ===== МОБИЛЬНЫЙ ПОИСК =====
+        const searchMobileBtn = document.querySelector('.search-mobile');
+        if (searchMobileBtn) {
+            searchMobileBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const searchInput = document.querySelector('.search-input');
+                searchInput.focus();
+                searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        }
+        
+        // ===== АКТИВНЫЙ ПУНКТ МОБИЛЬНОГО МЕНЮ =====
+        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+        mobileNavItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (this.classList.contains('search-mobile')) return;
+                
+                e.preventDefault();
+                mobileNavItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать шаблон сертификата - КиберФордж</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.9);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.95);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas матрицы на заднем плане */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 159, 0.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle, .notification-icon, .avatar {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .notification-icon {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--header-bg);
+        }
+
+        .avatar img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .avatar:hover img {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ===== ВЫПАДАЮЩИЕ МЕНЮ ===== */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            z-index: 1001;
+        }
+
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 255, 159, 0.05);
+            color: var(--accent);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .notification-dropdown {
+            right: -10px;
+        }
+
+        .avatar-dropdown {
+            right: 0;
+        }
+
+        /* ===== ОСНОВНОЕ СОДЕРЖИМОЕ ===== */
+        main {
+            padding: 120px 20px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .certificate-builder {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        @media (max-width: 1100px) {
+            .certificate-builder {
+                grid-template-columns: 1fr;
+                max-width: 800px;
+            }
+        }
+
+        /* Панель формы */
+        .form-panel {
+            background: linear-gradient(135deg, rgba(22, 22, 34, 0.85), rgba(22, 22, 34, 0.9));
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-title i {
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            background-color: var(--secondary-bg);
+            border: 2px dashed rgba(0, 255, 159, 0.3);
+            border-radius: var(--border-radius);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .file-label:hover {
+            border-color: var(--accent);
+            background-color: rgba(0, 255, 159, 0.05);
+            color: var(--accent);
+        }
+
+        .text-position-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .position-input {
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius-sm);
+            padding: 10px;
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .color-input {
+            width: 60px;
+            height: 40px;
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            background-color: #ffffff;
+        }
+
+        /* Панель предпросмотра */
+        .preview-panel {
+            background: linear-gradient(135deg, rgba(22, 22, 34, 0.85), rgba(22, 22, 34, 0.9));
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+        }
+
+        .preview-container {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            background-color: var(--secondary-bg);
+            border: 2px dashed rgba(0, 255, 159, 0.3);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .certificate-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 30px;
+        }
+
+        .preview-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: rgba(0, 255, 159, 0.3);
+        }
+
+        .text-overlay {
+            position: absolute;
+            pointer-events: none;
+            font-family: 'Times New Roman', serif;
+            color: #000000;
+        }
+
+        #fullNamePreview {
+            top: 45%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        #coursePreview {
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+        }
+
+        #datePreview {
+            bottom: 20%;
+            left: 20%;
+            font-size: 18px;
+        }
+
+        #idPreview {
+            bottom: 20%;
+            right: 20%;
+            font-size: 18px;
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            justify-content: center;
+        }
+
+        .btn-wide {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+        }
+
+        .info-box {
+            background-color: rgba(0, 255, 159, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+            font-size: 0.9rem;
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 40px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+        }
+
+        .light-theme footer {
+            background-color: rgba(245, 247, 250, 0.9);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        @media (max-width: 992px) {
+            .certificate-builder {
+                gap: 30px;
+            }
+            
+            .form-panel, .preview-panel {
+                padding: 30px;
+            }
+            
+            .preview-container {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .certificate-builder {
+                gap: 20px;
+            }
+            
+            .form-panel, .preview-panel {
+                padding: 25px;
+            }
+            
+            .preview-container {
+                height: 350px;
+            }
+            
+            .text-position-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .form-panel, .preview-panel {
+                padding: 20px;
+            }
+            
+            .preview-container {
+                height: 300px;
+            }
+            
+            .form-title {
+                font-size: 1.3rem;
+            }
+            
+            .theme-toggle, .notification-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .avatar img {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .certificate-builder > * {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .form-panel { animation-delay: 0.2s; }
+        .preview-panel { animation-delay: 0.4s; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas для матричного эффекта -->
+    <canvas id="matrixCanvas"></canvas>
+    
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="index.html" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск по платформе...">
+            </div>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Уведомления -->
+                <div class="notification-icon" id="notificationIcon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                    <!-- Выпадающее меню уведомлений -->
+                    <div class="dropdown notification-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-bell"></i> Уведомления
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Новый сертификат готов к выдаче</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-users"></i>
+                            <span>Ученик завершил ваш курс</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-comment"></i>
+                            <span>Новый комментарий в вашей статье</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-eye"></i>
+                            <span>Показать все уведомления</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Аватар и меню пользователя -->
+                <div class="avatar" id="avatar">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Аватар пользователя">
+                    <!-- Выпадающее меню пользователя -->
+                    <div class="dropdown avatar-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-user"></i> Алексей Киберов
+                        </div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-newspaper"></i>
+                            <span>Мои статьи</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-users"></i>
+                            <span>Мои классы</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Мои сертификаты</span>
+                        </a>
+                        <a href="certificate-create.html" class="dropdown-item active">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Создать шаблон</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выход</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main>
+        <h1 class="page-title">Создать шаблон сертификата</h1>
+        
+        <div class="certificate-builder">
+            <!-- Панель формы -->
+            <div class="form-panel">
+                <div class="form-section">
+                    <h2 class="form-title"><i class="fas fa-file-upload"></i> Загрузка фона</h2>
+                    <div class="form-group">
+                        <label class="form-label">Загрузите изображение фона (PNG/JPG)</label>
+                        <div class="file-upload">
+                            <input type="file" id="backgroundUpload" class="file-input" accept=".png,.jpg,.jpeg">
+                            <label for="backgroundUpload" class="file-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span id="fileLabelText">Выберите файл или перетащите сюда</span>
+                            </label>
+                        </div>
+                        <p style="margin-top: 10px; color: var(--text-secondary); font-size: 0.9rem;">
+                            Рекомендуемый размер: 1200×800 пикселей
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2 class="form-title"><i class="fas fa-font"></i> Настройка текста</h2>
+                    
+                    <div class="info-box">
+                        <p>Перетащите текстовые поля на превью справа или задайте координаты вручную</p>
+                    </div>
+                    
+                    <!-- Поле ФИО -->
+                    <div class="form-group">
+                        <label class="form-label">ФИО получателя</label>
+                        <div class="text-position-grid">
+                            <input type="text" id="fullNameText" class="form-input" placeholder="Иванов Иван Иванович" value="Иванов Иван Иванович">
+                            <input type="number" id="fullNameX" class="position-input" placeholder="X" value="400">
+                            <input type="number" id="fullNameY" class="position-input" placeholder="Y" value="225">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Цвет:</span>
+                            <input type="color" id="fullNameColor" class="color-input" value="#000000">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Размер:</span>
+                            <input type="number" id="fullNameSize" class="position-input" value="36" min="10" max="100" style="width: 80px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Поле названия курса -->
+                    <div class="form-group">
+                        <label class="form-label">Название курса</label>
+                        <div class="text-position-grid">
+                            <input type="text" id="courseText" class="form-input" placeholder="Кибербезопасность для начинающих" value="Кибербезопасность для начинающих">
+                            <input type="number" id="courseX" class="position-input" placeholder="X" value="400">
+                            <input type="number" id="courseY" class="position-input" placeholder="Y" value="300">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Цвет:</span>
+                            <input type="color" id="courseColor" class="color-input" value="#000000">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Размер:</span>
+                            <input type="number" id="courseSize" class="position-input" value="24" min="10" max="100" style="width: 80px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Поле даты -->
+                    <div class="form-group">
+                        <label class="form-label">Дата выдачи</label>
+                        <div class="text-position-grid">
+                            <input type="text" id="dateText" class="form-input" placeholder="01 января 2026" value="01 января 2026">
+                            <input type="number" id="dateX" class="position-input" placeholder="X" value="240">
+                            <input type="number" id="dateY" class="position-input" placeholder="Y" value="400">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Цвет:</span>
+                            <input type="color" id="dateColor" class="color-input" value="#000000">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Размер:</span>
+                            <input type="number" id="dateSize" class="position-input" value="18" min="10" max="100" style="width: 80px;">
+                        </div>
+                    </div>
+                    
+                    <!-- Поле ID -->
+                    <div class="form-group">
+                        <label class="form-label">ID сертификата</label>
+                        <div class="text-position-grid">
+                            <input type="text" id="idText" class="form-input" placeholder="CF-2026-001" value="CF-2026-001">
+                            <input type="number" id="idX" class="position-input" placeholder="X" value="560">
+                            <input type="number" id="idY" class="position-input" placeholder="Y" value="400">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px; margin-top: 10px;">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Цвет:</span>
+                            <input type="color" id="idColor" class="color-input" value="#000000">
+                            <span style="color: var(--text-secondary); font-size: 0.9rem;">Размер:</span>
+                            <input type="number" id="idSize" class="position-input" value="18" min="10" max="100" style="width: 80px;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-wide pulse-animation" id="saveTemplateBtn">
+                        <i class="fas fa-save"></i> Сохранить шаблон
+                    </button>
+                    <button class="btn-secondary btn-wide" id="previewBtn">
+                        <i class="fas fa-eye"></i> Предпросмотр
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Панель предпросмотра -->
+            <div class="preview-panel">
+                <h2 class="form-title"><i class="fas fa-desktop"></i> Предпросмотр сертификата</h2>
+                
+                <div class="preview-container" id="previewContainer">
+                    <!-- Заглушка для превью -->
+                    <div class="preview-placeholder" id="previewPlaceholder">
+                        <i class="fas fa-certificate"></i>
+                        <p>Загрузите изображение фона, чтобы увидеть предпросмотр</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">Рекомендуемый размер: 1200×800 пикселей</p>
+                    </div>
+                    
+                    <!-- Изображение фона -->
+                    <img id="certificateBackground" class="certificate-preview" alt="Фон сертификата">
+                    
+                    <!-- Текстовые элементы поверх фона -->
+                    <div id="fullNamePreview" class="text-overlay">Иванов Иван Иванович</div>
+                    <div id="coursePreview" class="text-overlay">Кибербезопасность для начинающих</div>
+                    <div id="datePreview" class="text-overlay">01 января 2026</div>
+                    <div id="idPreview" class="text-overlay">CF-2026-001</div>
+                </div>
+                
+                <div class="preview-controls">
+                    <button class="btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo"></i> Сбросить
+                    </button>
+                    <button class="btn-secondary" id="testDataBtn">
+                        <i class="fas fa-vial"></i> Тестовые данные
+                    </button>
+                </div>
+                
+                <div class="info-box" style="margin-top: 30px;">
+                    <p><strong>Совет:</strong> После сохранения шаблона вы сможете использовать его для автоматической генерации сертификатов для ваших учеников.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Сертификаты</h3>
+                    <ul>
+                        <li><a href="certificate-create.html">Создать шаблон</a></li>
+                        <li><a href="#">Мои шаблоны</a></li>
+                        <li><a href="#">Выданные сертификаты</a></li>
+                        <li><a href="#">Проверить сертификат</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Платформа</h3>
+                    <ul>
+                        <li><a href="index.html">Главная страница</a></li>
+                        <li><a href="about.html">О проекте</a></li>
+                        <li><a href="rules.html">Правила платформы</a></li>
+                        <li><a href="privacy.html">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023-2026 КиберФордж. Все права защищены.</p>
+                <p><small>Сертификаты платформы защищены от подделки уникальными ID</small></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // Инициализация матричной анимации
+            initMatrixAnimation();
+            
+            // Инициализация функционала сертификата
+            initCertificateBuilder();
+        });
+        
+        // ===== ВЫПАДАЮЩИЕ МЕНЮ =====
+        const notificationIcon = document.getElementById('notificationIcon');
+        const avatar = document.getElementById('avatar');
+        const notificationDropdown = notificationIcon.querySelector('.dropdown');
+        const avatarDropdown = avatar.querySelector('.dropdown');
+        
+        // Открытие/закрытие меню уведомлений
+        notificationIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Открытие/закрытие меню пользователя
+        avatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('active');
+            notificationDropdown.classList.remove('active');
+        });
+        
+        // Закрытие всех меню при клике вне их
+        document.addEventListener('click', () => {
+            notificationDropdown.classList.remove('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Предотвращение закрытия при клике внутри меню
+        notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
+        avatarDropdown.addEventListener('click', (e) => e.stopPropagation());
+        
+        // ===== МАТРИЧНАЯ АНИМАЦИЯ НА CANVAS =====
+        function initMatrixAnimation() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Устанавливаем размер canvas
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Символы матрицы
+            const matrixChars = '01📜🏆🎓📄📑📊📈📉🔐🔒🏅ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~';
+            const chars = matrixChars.split('');
+            
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            
+            // Массив для отслежиния позиции капли по каждому столбцу
+            const drops = [];
+            
+            // Инициализируем капли
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+            }
+            
+            // Функция отрисовки
+            function draw() {
+                // Полупрозрачный черный фон для эффекта следа
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Цвет символов
+                ctx.fillStyle = '#00ff9f';
+                ctx.font = `${fontSize}px 'Courier New', monospace`;
+                
+                // Отрисовка символов
+                for (let i = 0; i < drops.length; i++) {
+                    // Случайный символ
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    
+                    // Рандомная яркость
+                    const brightness = 0.1 + Math.random() * 0.5;
+                    
+                    // Рисуем символ
+                    ctx.fillStyle = `rgba(0, 255, 159, ${brightness})`;
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    // Если капля достигла низа или случайно, сбрасываем её
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    // Перемещаем каплю вниз
+                    drops[i]++;
+                }
+            }
+            
+            // Запускаем анимацию
+            function animate() {
+                draw();
+                requestAnimationFrame(animate);
+            }
+            
+            // Обработчик изменения размера окна
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+            
+            // Запускаем анимацию
+            animate();
+        }
+        
+        // ===== ФУНКЦИОНАЛ СОЗДАНИЯ СЕРТИФИКАТА =====
+        function initCertificateBuilder() {
+            const backgroundUpload = document.getElementById('backgroundUpload');
+            const certificateBackground = document.getElementById('certificateBackground');
+            const previewPlaceholder = document.getElementById('previewPlaceholder');
+            const saveTemplateBtn = document.getElementById('saveTemplateBtn');
+            const previewBtn = document.getElementById('previewBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const testDataBtn = document.getElementById('testDataBtn');
+            
+            // Элементы предпросмотра текста
+            const fullNamePreview = document.getElementById('fullNamePreview');
+            const coursePreview = document.getElementById('coursePreview');
+            const datePreview = document.getElementById('datePreview');
+            const idPreview = document.getElementById('idPreview');
+            
+            // Поля ввода текста
+            const fullNameText = document.getElementById('fullNameText');
+            const courseText = document.getElementById('courseText');
+            const dateText = document.getElementById('dateText');
+            const idText = document.getElementById('idText');
+            
+            // Поля позиций
+            const fullNameX = document.getElementById('fullNameX');
+            const fullNameY = document.getElementById('fullNameY');
+            const courseX = document.getElementById('courseX');
+            const courseY = document.getElementById('courseY');
+            const dateX = document.getElementById('dateX');
+            const dateY = document.getElementById('dateY');
+            const idX = document.getElementById('idX');
+            const idY = document.getElementById('idY');
+            
+            // Поля цвета и размера
+            const fullNameColor = document.getElementById('fullNameColor');
+            const fullNameSize = document.getElementById('fullNameSize');
+            const courseColor = document.getElementById('courseColor');
+            const courseSize = document.getElementById('courseSize');
+            const dateColor = document.getElementById('dateColor');
+            const dateSize = document.getElementById('dateSize');
+            const idColor = document.getElementById('idColor');
+            const idSize = document.getElementById('idSize');
+            
+            // Загрузка фона
+            backgroundUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        certificateBackground.src = event.target.result;
+                        certificateBackground.style.display = 'block';
+                        previewPlaceholder.style.display = 'none';
+                        
+                        // Обновляем текст файла
+                        document.getElementById('fileLabelText').textContent = file.name;
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Обновление предпросмотра при изменении текста
+            function updatePreview() {
+                // Текст
+                fullNamePreview.textContent = fullNameText.value;
+                coursePreview.textContent = courseText.value;
+                datePreview.textContent = dateText.value;
+                idPreview.textContent = idText.value;
+                
+                // Позиции
+                fullNamePreview.style.left = fullNameX.value + 'px';
+                fullNamePreview.style.top = fullNameY.value + 'px';
+                coursePreview.style.left = courseX.value + 'px';
+                coursePreview.style.top = courseY.value + 'px';
+                datePreview.style.left = dateX.value + 'px';
+                datePreview.style.top = dateY.value + 'px';
+                idPreview.style.left = idX.value + 'px';
+                idPreview.style.top = idY.value + 'px';
+                
+                // Цвет и размер
+                fullNamePreview.style.color = fullNameColor.value;
+                fullNamePreview.style.fontSize = fullNameSize.value + 'px';
+                coursePreview.style.color = courseColor.value;
+                coursePreview.style.fontSize = courseSize.value + 'px';
+                datePreview.style.color = dateColor.value;
+                datePreview.style.fontSize = dateSize.value + 'px';
+                idPreview.style.color = idColor.value;
+                idPreview.style.fontSize = idSize.value + 'px';
+            }
+            
+            // Слушатели изменений для всех полей
+            const allInputs = [
+                fullNameText, courseText, dateText, idText,
+                fullNameX, fullNameY, courseX, courseY, dateX, dateY, idX, idY,
+                fullNameColor, fullNameSize, courseColor, courseSize, dateColor, dateSize, idColor, idSize
+            ];
+            
+            allInputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+            });
+            
+            // Перетаскивание текстовых элементов (упрощенная версия)
+            function makeDraggable(element, xInput, yInput) {
+                let isDragging = false;
+                let startX, startY, initialX, initialY;
+                
+                element.addEventListener('mousedown', startDrag);
+                element.addEventListener('touchstart', startDragTouch);
+                
+                function startDrag(e) {
+                    e.preventDefault();
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    initialX = parseInt(xInput.value) || 0;
+                    initialY = parseInt(yInput.value) || 0;
+                    
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('mouseup', stopDrag);
+                }
+                
+                function startDragTouch(e) {
+                    e.preventDefault();
+                    isDragging = true;
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    initialX = parseInt(xInput.value) || 0;
+                    initialY = parseInt(yInput.value) || 0;
+                    
+                    document.addEventListener('touchmove', dragTouch);
+                    document.addEventListener('touchend', stopDrag);
+                }
+                
+                function drag(e) {
+                    if (!isDragging) return;
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    
+                    xInput.value = initialX + deltaX;
+                    yInput.value = initialY + deltaY;
+                    updatePreview();
+                }
+                
+                function dragTouch(e) {
+                    if (!isDragging) return;
+                    const deltaX = e.touches[0].clientX - startX;
+                    const deltaY = e.touches[0].clientY - startY;
+                    
+                    xInput.value = initialX + deltaX;
+                    yInput.value = initialY + deltaY;
+                    updatePreview();
+                }
+                
+                function stopDrag() {
+                    isDragging = false;
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('touchmove', dragTouch);
+                    document.removeEventListener('mouseup', stopDrag);
+                    document.removeEventListener('touchend', stopDrag);
+                }
+            }
+            
+            // Делаем текстовые элементы перетаскиваемыми
+            makeDraggable(fullNamePreview, fullNameX, fullNameY);
+            makeDraggable(coursePreview, courseX, courseY);
+            makeDraggable(datePreview, dateX, dateY);
+            makeDraggable(idPreview, idX, idY);
+            
+            // Кнопка сохранения шаблона
+            saveTemplateBtn.addEventListener('click', function() {
+                // Проверка загружен ли фон
+                if (!certificateBackground.src || certificateBackground.src.includes('data:') === false) {
+                    alert('Пожалуйста, сначала загрузите фон для сертификата');
+                    return;
+                }
+                
+                // Сохранение данных (в реальном проекте здесь была бы отправка на сервер)
+                const templateData = {
+                    background: certificateBackground.src,
+                    fullName: {
+                        text: fullNameText.value,
+                        x: fullNameX.value,
+                        y: fullNameY.value,
+                        color: fullNameColor.value,
+                        size: fullNameSize.value
+                    },
+                    course: {
+                        text: courseText.value,
+                        x: courseX.value,
+                        y: courseY.value,
+                        color: courseColor.value,
+                        size: courseSize.value
+                    },
+                    date: {
+                        text: dateText.value,
+                        x: dateX.value,
+                        y: dateY.value,
+                        color: dateColor.value,
+                        size: dateSize.value
+                    },
+                    id: {
+                        text: idText.value,
+                        x: idX.value,
+                        y: idY.value,
+                        color: idColor.value,
+                        size: idSize.value
+                    }
+                };
+                
+                // Сохраняем в localStorage для демонстрации
+                localStorage.setItem('certificateTemplate', JSON.stringify(templateData));
+                
+                alert('Шаблон сохранён! Теперь вы можете использовать его для генерации сертификатов.');
+                
+                // Анимация успешного сохранения
+                this.innerHTML = '<i class="fas fa-check"></i> Шаблон сохранён!';
+                this.style.background = 'linear-gradient(135deg, #00cc7a, #00995c)';
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-save"></i> Сохранить шаблон';
+                    this.style.background = 'linear-gradient(135deg, var(--accent), var(--accent-dark))';
+                }, 2000);
+            });
+            
+            // Кнопка предпросмотра
+            previewBtn.addEventListener('click', function() {
+                updatePreview();
+                alert('Предпросмотр обновлён! Проверьте как выглядит ваш сертификат справа.');
+            });
+            
+            // Кнопка сброса
+            resetBtn.addEventListener('click', function() {
+                if (confirm('Сбросить все настройки к значениям по умолчанию?')) {
+                    // Сброс текста
+                    fullNameText.value = 'Иванов Иван Иванович';
+                    courseText.value = 'Кибербезопасность для начинающих';
+                    dateText.value = '01 января 2026';
+                    idText.value = 'CF-2026-001';
+                    
+                    // Сброс позиций
+                    fullNameX.value = 400;
+                    fullNameY.value = 225;
+                    courseX.value = 400;
+                    courseY.value = 300;
+                    dateX.value = 240;
+                    dateY.value = 400;
+                    idX.value = 560;
+                    idY.value = 400;
+                    
+                    // Сброс цвета и размера
+                    fullNameColor.value = '#000000';
+                    fullNameSize.value = 36;
+                    courseColor.value = '#000000';
+                    courseSize.value = 24;
+                    dateColor.value = '#000000';
+                    dateSize.value = 18;
+                    idColor.value = '#000000';
+                    idSize.value = 18;
+                    
+                    updatePreview();
+                }
+            });
+            
+            // Кнопка тестовых данных
+            testDataBtn.addEventListener('click', function() {
+                fullNameText.value = 'Петров Алексей Сергеевич';
+                courseText.value = 'Программирование на Python';
+                dateText.value = '15 марта 2026';
+                idText.value = 'CF-2026-042';
+                
+                // Немного меняем позиции для разнообразия
+                fullNameX.value = 420;
+                fullNameY.value = 230;
+                courseX.value = 410;
+                courseY.value = 310;
+                dateX.value = 250;
+                dateY.value = 410;
+                idX.value = 570;
+                idY.value = 410;
+                
+                updatePreview();
+            });
+            
+            // Инициализация предпросмотра
+            updatePreview();
+        }
+        
+        // ===== ОБРАБОТКА ПОИСКА =====
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                alert('Поиск по платформе будет реализован в ближайших обновлениях. Сейчас вы можете перейти на главную страницу для выбора категорий обучения.');
+                this.value = '';
+            }
+        });
+    </script>
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать класс - КиберФордж</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.85);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.92);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(1200px circle at 20% 10%, rgba(120, 180, 255, 0.14), transparent 40%),
+                radial-gradient(1000px circle at 80% 20%, rgba(180, 120, 255, 0.12), transparent 45%),
+                radial-gradient(900px circle at 50% 80%, rgba(120, 255, 200, 0.12), transparent 50%),
+                linear-gradient(180deg, #0b0f1a 0%, #05070c 100%);
+            color: var(--text-primary);
+            transition: background 0.25s ease, color 0.2s ease;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .light-theme body {
+            background:
+                radial-gradient(1200px circle at 20% 10%, rgba(120, 180, 255, 0.08), transparent 40%),
+                radial-gradient(1000px circle at 80% 20%, rgba(180, 120, 255, 0.06), transparent 45%),
+                radial-gradient(900px circle at 50% 80%, rgba(120, 255, 200, 0.06), transparent 50%),
+                linear-gradient(180deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 159, 0.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle, .notification-icon, .avatar {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .notification-icon {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--header-bg);
+        }
+
+        .avatar img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .avatar:hover img {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ===== ВЫПАДАЮЩИЕ МЕНЮ ===== */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            z-index: 1001;
+        }
+
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 255, 159, 0.05);
+            color: var(--accent);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .notification-dropdown {
+            right: -10px;
+        }
+
+        .avatar-dropdown {
+            right: 0;
+        }
+
+        /* ===== ОСНОВНОЕ СОДЕРЖИМОЕ ===== */
+        .create-class-container {
+            padding: 120px 0 80px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .create-class-box {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 50px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .create-class-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+        }
+
+        .create-class-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .create-class-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .create-class-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .form-label span {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2300ff9f' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 12px;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .form-number {
+            width: 120px;
+        }
+
+        .form-hint {
+            display: block;
+            margin-top: 5px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .file-upload-area {
+            border: 2px dashed rgba(0, 255, 159, 0.3);
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            background-color: rgba(0, 255, 159, 0.02);
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--accent);
+            background-color: rgba(0, 255, 159, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+        .file-upload-text {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .file-upload-subtext {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+            padding: 16px;
+            font-size: 1.1rem;
+        }
+
+        .requirements-box {
+            background-color: rgba(0, 102, 255, 0.05);
+            border-left: 4px solid #0066ff;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+        }
+
+        .requirements-box h4 {
+            color: #0066ff;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .requirements-box ul {
+            margin-left: 20px;
+        }
+
+        .requirements-box li {
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 50px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .light-theme footer {
+            background-color: rgba(245, 247, 250, 0.9);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .social-icon:hover {
+            background-color: var(--accent);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        @media (max-width: 992px) {
+            .create-class-box {
+                padding: 40px;
+            }
+            
+            .create-class-title {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .create-class-box {
+                padding: 30px 25px;
+            }
+            
+            .create-class-title {
+                font-size: 2rem;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .form-number {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .create-class-box {
+                padding: 25px 20px;
+            }
+            
+            .create-class-title {
+                font-size: 1.8rem;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .header-right .theme-toggle,
+            .header-right .notification-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="index.html" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск курсов, статей...">
+            </div>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Уведомления -->
+                <div class="notification-icon" id="notificationIcon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                    <!-- Выпадающее меню уведомлений -->
+                    <div class="dropdown notification-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-bell"></i> Уведомления
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-book"></i>
+                            <span>Новый курс по кибербезопасности доступен</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Ваш сертификат готов к выдаче</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-comment"></i>
+                            <span>Новый комментарий в вашей статье</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Завтра вебинар по теме "AI в cybersecurity"</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-eye"></i>
+                            <span>Показать все уведомления</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Аватар и меню пользователя -->
+                <div class="avatar" id="avatar">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Аватар пользователя">
+                    <!-- Выпадающее меню пользователя -->
+                    <div class="dropdown avatar-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-user"></i> Алексей Киберов
+                        </div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-newspaper"></i>
+                            <span>Мои статьи</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-users"></i>
+                            <span>Мои классы</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Мои сертификаты</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выход</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main class="create-class-container container">
+        <div class="create-class-box">
+            <div class="create-class-header">
+                <h1 class="create-class-title">Создать новый класс</h1>
+                <p class="create-class-subtitle">Заполните форму для создания образовательного класса</p>
+            </div>
+            
+            <form id="createClassForm">
+                <div class="form-group">
+                    <label for="className" class="form-label">Название класса <span>*</span></label>
+                    <input type="text" id="className" class="form-input" placeholder="Введите название класса" required>
+                    <span class="form-hint">Например: "Основы кибербезопасности для начинающих"</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="classDescription" class="form-label">Описание класса <span>*</span></label>
+                    <textarea id="classDescription" class="form-textarea" placeholder="Опишите цели, содержание и ожидаемые результаты класса" required></textarea>
+                    <span class="form-hint">Минимум 200 символов. Опишите подробно, чему будут учиться участники.</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="classCategory" class="form-label">Тематика <span>*</span></label>
+                    <select id="classCategory" class="form-select" required>
+                        <option value="">Выберите тематику</option>
+                        <option value="cybersecurity">Кибербезопасность</option>
+                        <option value="programming">Программирование</option>
+                        <option value="ai">Искусственный интеллект</option>
+                        <option value="law">Законодательство в IT</option>
+                        <option value="antifraud">Противомошенничество</option>
+                        <option value="network">Сетевая безопасность</option>
+                        <option value="other">Другая тематика</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="participantLimit" class="form-label">Лимит участников <span>*</span></label>
+                    <input type="number" id="participantLimit" class="form-input form-number" min="1" max="40" value="40" required>
+                    <span class="form-hint">Максимальное количество участников: 40 человек (согласно правилам платформы)</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="classRules" class="form-label">Правила класса</label>
+                    <textarea id="classRules" class="form-textarea" placeholder="Опишите правила поведения в классе, требования к участникам, график занятий и т.д."></textarea>
+                    <span class="form-hint">Эти правила будут видны всем участникам класса.</span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Материалы класса</label>
+                    <div class="file-upload-area" id="fileUploadArea">
+                        <div class="file-upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="file-upload-text">Загрузить учебные материалы</div>
+                        <div class="file-upload-subtext">Перетащите файлы сюда или нажмите для выбора</div>
+                        <input type="file" class="file-upload-input" id="classMaterials" multiple>
+                    </div>
+                    <span class="form-hint">Поддерживаемые форматы: PDF, DOC, PPT, ZIP, изображения, видео. Максимальный размер файла: 100 МБ.</span>
+                </div>
+                
+                <div class="requirements-box">
+                    <h4>Требования к созданию класса:</h4>
+                    <ul>
+                        <li>Только верифицированные преподаватели могут создавать классы</li>
+                        <li>Максимальное количество участников — 40 человек</li>
+                        <li>Все материалы проходят проверку модерацией</li>
+                        <li>Класс должен иметь четкую образовательную цель</li>
+                        <li>Преподаватель обязан проверять задания и вести класс</li>
+                    </ul>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="window.history.back()">
+                        <i class="fas fa-arrow-left"></i> Назад
+                    </button>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-plus-circle"></i> Создать класс
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Быстрые ссылки</h3>
+                    <ul>
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="about.html">О проекте</a></li>
+                        <li><a href="rules.html">Правила платформы</a></li>
+                        <li><a href="privacy.html">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Для преподавателей</h3>
+                    <ul>
+                        <li><a href="new-class.html">Создать класс</a></li>
+                        <li><a href="#">Мои классы</a></li>
+                        <li><a href="#">Верификация</a></li>
+                        <li><a href="#">Поддержка</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 КиберФордж. Все права защищены. <a href="privacy.html" style="color: var(--accent);">Политика конфиденциальности</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        });
+        
+        // ===== ВЫПАДАЮЩИЕ МЕНЮ =====
+        const notificationIcon = document.getElementById('notificationIcon');
+        const avatar = document.getElementById('avatar');
+        const notificationDropdown = notificationIcon.querySelector('.dropdown');
+        const avatarDropdown = avatar.querySelector('.dropdown');
+        
+        // Открытие/закрытие меню уведомлений
+        notificationIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Открытие/закрытие меню пользователя
+        avatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('active');
+            notificationDropdown.classList.remove('active');
+        });
+        
+        // Закрытие всех меню при клике вне их
+        document.addEventListener('click', () => {
+            notificationDropdown.classList.remove('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Предотвращение закрытия при клике внутри меню
+        notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
+        avatarDropdown.addEventListener('click', (e) => e.stopPropagation());
+        
+        // ===== ЗАГРУЗКА ФАЙЛОВ =====
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const fileInput = document.getElementById('classMaterials');
+        
+        fileUploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--accent)';
+            fileUploadArea.style.backgroundColor = 'rgba(0, 255, 159, 0.1)';
+        });
+        
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.borderColor = 'rgba(0, 255, 159, 0.3)';
+            fileUploadArea.style.backgroundColor = 'rgba(0, 255, 159, 0.02)';
+        });
+        
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'rgba(0, 255, 159, 0.3)';
+            fileUploadArea.style.backgroundColor = 'rgba(0, 255, 159, 0.02)';
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                updateFileUploadText(files);
+            }
+        });
+        
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                updateFileUploadText(fileInput.files);
+            }
+        });
+        
+        function updateFileUploadText(files) {
+            const fileCount = files.length;
+            const fileUploadText = fileUploadArea.querySelector('.file-upload-text');
+            const fileUploadSubtext = fileUploadArea.querySelector('.file-upload-subtext');
+            
+            if (fileCount === 1) {
+                fileUploadText.textContent = `Выбран файл: ${files[0].name}`;
+            } else {
+                fileUploadText.textContent = `Выбрано файлов: ${fileCount}`;
+            }
+            
+            fileUploadSubtext.textContent = 'Нажмите для изменения выбора файлов';
+        }
+        
+        // ===== ОБРАБОТКА ФОРМЫ СОЗДАНИЯ КЛАССА =====
+        const createClassForm = document.getElementById('createClassForm');
+        
+        createClassForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const className = document.getElementById('className').value;
+            const classDescription = document.getElementById('classDescription').value;
+            const classCategory = document.getElementById('classCategory').value;
+            const participantLimit = document.getElementById('participantLimit').value;
+            const classRules = document.getElementById('classRules').value;
+            
+            // Проверка минимальной длины описания
+            if (classDescription.length < 200) {
+                alert('Описание класса должно содержать минимум 200 символов');
+                return;
+            }
+            
+            // Проверка выбора тематики
+            if (!classCategory) {
+                alert('Пожалуйста, выберите тематику класса');
+                return;
+            }
+            
+            // Проверка лимита участников
+            if (participantLimit < 1 || participantLimit > 40) {
+                alert('Лимит участников должен быть от 1 до 40 человек');
+                return;
+            }
+            
+            // В реальном приложении здесь была бы отправка данных на сервер
+            console.log('Создание класса:', { 
+                className, 
+                classDescription, 
+                classCategory, 
+                participantLimit, 
+                classRules 
+            });
+            
+            // Заглушка: сообщение об успешном создании
+            alert('Класс "' + className + '" успешно создан! После модерации он станет доступен для участников.');
+            
+            // Очистка формы (опционально)
+            createClassForm.reset();
+            
+            // Сброс текста в области загрузки файлов
+            const fileUploadText = fileUploadArea.querySelector('.file-upload-text');
+            const fileUploadSubtext = fileUploadArea.querySelector('.file-upload-subtext');
+            fileUploadText.textContent = 'Загрузить учебные материалы';
+            fileUploadSubtext.textContent = 'Перетащите файлы сюда или нажмите для выбора';
+        });
+    </script>
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

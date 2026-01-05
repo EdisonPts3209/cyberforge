@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поддержать проект - КиберФордж</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.9);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.95);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas матрицы на заднем плане */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 159, 0.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle, .back-to-home {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .back-to-home {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-to-home:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ===== ОСНОВНОЕ СОДЕРЖИМОЕ ===== */
+        main {
+            padding: 120px 20px 80px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* Стиль контента */
+        .support-scroll {
+            width: 100%;
+            max-width: 900px;
+            background: 
+                radial-gradient(circle at 50% 0%, rgba(0, 255, 159, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 0% 50%, rgba(0, 102, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(255, 0, 255, 0.02) 0%, transparent 50%),
+                linear-gradient(135deg, rgba(22, 22, 34, 0.85), rgba(22, 22, 34, 0.9));
+            border-radius: var(--border-radius);
+            padding: 60px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(0, 255, 159, 0.1),
+                inset 0 0 30px rgba(0, 255, 159, 0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .support-scroll::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2300ff9f' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.4;
+            z-index: 0;
+        }
+
+        .support-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Заголовки */
+        .support-title {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, #00ff9f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .support-title::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 40px 0 20px;
+            color: var(--accent);
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 255, 159, 0.2);
+            position: relative;
+        }
+
+        h2::before {
+            content: '💰';
+            position: absolute;
+            left: -30px;
+            color: var(--accent);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 25px 0 15px;
+            color: var(--text-primary);
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        .donation-goals {
+            background-color: rgba(0, 255, 159, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+            position: relative;
+        }
+
+        .donation-goals::before {
+            content: '🎯';
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            font-size: 1.8rem;
+            opacity: 0.5;
+        }
+
+        .crypto-methods, .other-methods {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.05), rgba(0, 102, 255, 0.05));
+            border: 2px solid rgba(0, 255, 159, 0.1);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: var(--border-radius);
+        }
+
+        .method-item {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .method-item:hover {
+            background-color: rgba(0, 255, 159, 0.05);
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .method-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.1), rgba(0, 102, 255, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .method-info {
+            flex-grow: 1;
+        }
+
+        .method-info h4 {
+            margin: 0 0 5px 0;
+            color: var(--accent);
+        }
+
+        .address {
+            font-family: 'Courier New', monospace;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px 15px;
+            border-radius: var(--border-radius-sm);
+            margin-top: 8px;
+            word-break: break-all;
+            font-size: 0.9rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .donation-history {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 140, 0, 0.05));
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: var(--border-radius);
+        }
+
+        .donation-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .donation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .donation-item:hover {
+            background-color: rgba(255, 215, 0, 0.05);
+            transform: translateX(5px);
+        }
+
+        .donor-name {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .donation-amount {
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .donation-date {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .thank-you-box {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.1), rgba(0, 102, 255, 0.1));
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            padding: 30px;
+            margin: 30px 0;
+            border-radius: var(--border-radius);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thank-you-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            margin: 40px 0;
+            border: none;
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 40px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+        }
+
+        .light-theme footer {
+            background-color: rgba(245, 247, 250, 0.9);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        @media (max-width: 992px) {
+            .support-scroll {
+                padding: 40px;
+            }
+            
+            .support-title {
+                font-size: 2.5rem;
+            }
+            
+            h2 {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .support-scroll {
+                padding: 30px 25px;
+            }
+            
+            .support-title {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+            }
+            
+            h2::before {
+                left: -20px;
+            }
+            
+            .method-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .back-to-home span {
+                display: none;
+            }
+            
+            .back-to-home {
+                padding: 8px;
+            }
+            
+            .donation-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .support-scroll {
+                padding: 25px 20px;
+            }
+            
+            .support-title {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.2rem;
+            }
+            
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .support-content > * {
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .support-content > *:nth-child(1) { animation-delay: 0.1s; }
+        .support-content > *:nth-child(2) { animation-delay: 0.2s; }
+        .support-content > *:nth-child(3) { animation-delay: 0.3s; }
+        .support-content > *:nth-child(4) { animation-delay: 0.4s; }
+        .support-content > *:nth-child(5) { animation-delay: 0.5s; }
+        .support-content > *:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas для матричного эффекта -->
+    <canvas id="matrixCanvas"></canvas>
+    
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="index.html" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск по платформе...">
+            </div>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Кнопка "На главную" -->
+                <a href="index.html" class="back-to-home">
+                    <i class="fas fa-home"></i>
+                    <span>На главную</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main>
+        <div class="support-scroll">
+            <div class="support-content">
+                <h1 class="support-title">Поддержать КиберФордж</h1>
+                
+                <p>Платформа КиберФордж полностью бесплатная и развивается исключительно на добровольных пожертвованиях сообщества и энтузиазме команды.</p>
+                
+                <div class="donation-goals">
+                    <h3>Ваши донаты помогут:</h3>
+                    <ul>
+                        <li><strong>Развивать новые курсы и классы</strong> — создание качественного образовательного контента</li>
+                        <li><strong>Улучшать систему модерации и верификации</strong> — поддержание высоких стандартов качества</li>
+                        <li><strong>Поддерживать серверы и инфраструктуру</strong> — обеспечение стабильной работы платформы</li>
+                        <li><strong>Добавлять новые функции</strong> — тесты, сертификаты, аналитика, улучшение интерфейса</li>
+                    </ul>
+                </div>
+                
+                <h2>Способы поддержки:</h2>
+                
+                <div class="crypto-methods">
+                    <h3>Криптовалюта</h3>
+                    
+                    <div class="method-item">
+                        <div class="method-icon">
+                            <i class="fab fa-bitcoin"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>Bitcoin (BTC)</h4>
+                            <p>Используйте этот адрес для переводов в сети Bitcoin</p>
+                            <div class="address">bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh</div>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <div class="method-icon">
+                            <i class="fab fa-ethereum"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>Ethereum (ETH)</h4>
+                            <p>Используйте этот адрес для переводов в сети Ethereum</p>
+                            <div class="address">0x742d35Cc6634C0532925a3b844Bc9e99F7cA7b6F</div>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <div class="method-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>USDT (TRC20)</h4>
+                            <p>Используйте этот адрес для переводов USDT в сети Tron</p>
+                            <div class="address">TNSK2yXa8k8jG3XG7Lc4qP5m5dH6tF8sJ9kL2n</div>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <div class="method-icon">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>TON</h4>
+                            <p>Используйте этот адрес для переводов в сети The Open Network</p>
+                            <div class="address">EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="other-methods">
+                    <h3>Другие способы</h3>
+                    
+                    <div class="method-item">
+                        <div class="method-icon" style="background: linear-gradient(135deg, rgba(0, 136, 204, 0.1), rgba(0, 68, 102, 0.1)); color: #0088cc;">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>Telegram Stars</h4>
+                            <p>Через бот <strong>@kiberforzh_donate_bot</strong></p>
+                            <p>Быстрый и удобный способ поддержать проект через Telegram</p>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <div class="method-icon" style="background: linear-gradient(135deg, rgba(123, 97, 255, 0.1), rgba(61, 48, 128, 0.1)); color: #7B61FF;">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="method-info">
+                            <h4>ЮMoney и другие способы</h4>
+                            <p><em>Скоро будут доступны</em></p>
+                            <p>Мы работаем над добавлением дополнительных способов оплаты</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="donation-history">
+                    <h3>Анонимная история донатов (последние 10):</h3>
+                    
+                    <ul class="donation-list">
+                        <li class="donation-item">
+                            <span class="donor-name">Аноним</span>
+                            <span class="donation-amount">0.01 BTC</span>
+                            <span class="donation-date">01.01.2026</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">User123</span>
+                            <span class="donation-amount">500 Stars</span>
+                            <span class="donation-date">31.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">КиберЭнтузиаст</span>
+                            <span class="donation-amount">0.5 ETH</span>
+                            <span class="donation-date">30.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">Аноним</span>
+                            <span class="donation-amount">1000 USDT</span>
+                            <span class="donation-date">29.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">DevPro</span>
+                            <span class="donation-amount">50 TON</span>
+                            <span class="donation-date">28.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">Аноним</span>
+                            <span class="donation-amount">0.005 BTC</span>
+                            <span class="donation-date">27.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">CodeMaster</span>
+                            <span class="donation-amount">300 Stars</span>
+                            <span class="donation-date">26.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">Аноним</span>
+                            <span class="donation-amount">0.2 ETH</span>
+                            <span class="donation-date">25.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">SecurityGeek</span>
+                            <span class="donation-amount">500 USDT</span>
+                            <span class="donation-date">24.12.2025</span>
+                        </li>
+                        <li class="donation-item">
+                            <span class="donor-name">Аноним</span>
+                            <span class="donation-amount">25 TON</span>
+                            <span class="donation-date">23.12.2025</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="thank-you-box">
+                    <h2><i class="fas fa-heart" style="color: #ff4757; margin-right: 10px;"></i> Спасибо каждому, кто поддерживает проект!</h2>
+                    <p style="font-size: 1.2rem; margin-top: 15px;">Вы помогаете делать образование в IT лучше, доступнее и качественнее. Каждое пожертвование, независимо от размера, приближает нас к цели — созданию лучшей образовательной платформы для киберспециалистов.</p>
+                    
+                    <button class="btn pulse-animation" style="margin-top: 25px;" onclick="copyAddress('btc')">
+                        <i class="fas fa-copy"></i> Скопировать адрес BTC
+                    </button>
+                    
+                    <p style="margin-top: 20px; font-size: 0.9rem; color: var(--text-secondary);">
+                        <i class="fas fa-info-circle"></i> После совершения доната вы можете отправить подтверждение на support@cyberforge.red1dark.ru для добавления в историю (по желанию)
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <p><small>Ваша поддержка — это инвестиция в будущее IT-образования. Спасибо, что верите в наш проект!</small></p>
+                    <a href="index.html" class="btn-secondary" style="margin-top: 15px;">
+                        <i class="fas fa-arrow-left"></i> Вернуться на главную
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>О платформе</h3>
+                    <ul>
+                        <li><a href="index.html">Главная страница</a></li>
+                        <li><a href="about.html">О проекте</a></li>
+                        <li><a href="rules.html">Правила платформы</a></li>
+                        <li><a href="privacy.html">Политика конфиденциальности</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Поддержка</h3>
+                    <ul>
+                        <li><a href="support.html">Поддержать проект</a></li>
+                        <li><a href="register.html">Регистрация</a></li>
+                        <li><a href="login.html">Вход в систему</a></li>
+                        <li><a href="#"></a>Обратная связь</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023-2026 КиберФордж. Все права защищены.</p>
+                <p><small>Образовательная платформа для киберспециалистов. Запуск проекта: 2 января 2026 года.</small></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // Инициализация матричной анимации
+            initMatrixAnimation();
+        });
+        
+        // ===== МАТРИЧНАЯ АНИМАЦИЯ НА CANVAS =====
+        function initMatrixAnimation() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Устанавливаем размер canvas
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Символы матрицы
+            const matrixChars = '01💰💎💳💵💸💹💱💲💴💶💷🎁🤝❤️🔥🚀🌟✨💫⭐️ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~';
+            const chars = matrixChars.split('');
+            
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            
+            // Массив для отслежиния позиции капли по каждому столбцу
+            const drops = [];
+            
+            // Инициализируем капли
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+            }
+            
+            // Функция отрисовки
+            function draw() {
+                // Полупрозрачный черный фон для эффекта следа
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Цвет символов
+                ctx.fillStyle = '#00ff9f';
+                ctx.font = `${fontSize}px 'Courier New', monospace`;
+                
+                // Отрисовка символов
+                for (let i = 0; i < drops.length; i++) {
+                    // Случайный символ
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    
+                    // Рандомная яркость
+                    const brightness = 0.1 + Math.random() * 0.5;
+                    
+                    // Рисуем символ
+                    ctx.fillStyle = `rgba(0, 255, 159, ${brightness})`;
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    // Если капля достигла низа или случайно, сбрасываем её
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    // Перемещаем каплю вниз
+                    drops[i]++;
+                }
+            }
+            
+            // Запускаем анимацию
+            function animate() {
+                draw();
+                requestAnimationFrame(animate);
+            }
+            
+            // Обработчик изменения размера окна
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+            
+            // Запускаем анимацию
+            animate();
+        }
+        
+        // ===== ФУНКЦИЯ КОПИРОВАНИЯ АДРЕСА =====
+        function copyAddress(type) {
+            let address = '';
+            let currency = '';
+            
+            switch(type) {
+                case 'btc':
+                    address = 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh';
+                    currency = 'Bitcoin (BTC)';
+                    break;
+                case 'eth':
+                    address = '0x742d35Cc6634C0532925a3b844Bc9e99F7cA7b6F';
+                    currency = 'Ethereum (ETH)';
+                    break;
+                case 'usdt':
+                    address = 'TNSK2yXa8k8jG3XG7Lc4qP5m5dH6tF8sJ9kL2n';
+                    currency = 'USDT (TRC20)';
+                    break;
+                case 'ton':
+                    address = 'EQCD39VS5jcptHL8vMjEXrzGaRcCVYto7HUn4bpAOg8xqB2N';
+                    currency = 'TON';
+                    break;
+                default:
+                    return;
+            }
+            
+            navigator.clipboard.writeText(address).then(() => {
+                alert(`Адрес ${currency} скопирован в буфер обмена!\n\n${address}`);
+            }).catch(err => {
+                console.error('Ошибка при копировании: ', err);
+                alert('Не удалось скопировать адрес. Скопируйте его вручную.');
+            });
+        }
+        
+        // ===== ПЛАВНАЯ ПРОКРУТКА =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // ===== АНИМАЦИЯ ПРИ НАВЕДЕНИИ НА ЭЛЕМЕНТЫ =====
+        document.querySelectorAll('.method-item, .donation-item, .btn').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+                this.style.boxShadow = '0 8px 15px var(--accent-glow)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('pulse-animation')) {
+                    this.style.transform = 'translateY(0)';
+                }
+                this.style.boxShadow = '0 4px 15px var(--accent-glow)';
+            });
+        });
+        
+        // ===== ОБРАБОТКА ПОИСКА =====
+        const searchInput = document.querySelector('.search-input');
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                alert('Поиск по платформе будет реализован в ближайших обновлениях. Сейчас вы можете перейти на главную страницу для выбора категорий обучения.');
+                this.value = '';
+            }
+        });
+        
+        // ===== ГЕНЕРАЦИЯ СЛУЧАЙНЫХ ДОНОВ =====
+        function updateDonationList() {
+            const donors = ['Аноним', 'User123', 'КиберЭнтузиаст', 'DevPro', 'CodeMaster', 'SecurityGeek', 'HackerPro', 'ITStudent', 'CyberGuard', 'CodeNinja'];
+            const amounts = ['0.01 BTC', '500 Stars', '0.5 ETH', '1000 USDT', '50 TON', '0.005 BTC', '300 Stars', '0.2 ETH', '500 USDT', '25 TON'];
+            const dates = ['01.01.2026', '31.12.2025', '30.12.2025', '29.12.2025', '28.12.2025', '27.12.2025', '26.12.2025', '25.12.2025', '24.12.2025', '23.12.2025'];
+            
+            const donationItems = document.querySelectorAll('.donation-item');
+            
+            donationItems.forEach((item, index) => {
+                const donorName = item.querySelector('.donor-name');
+                const donationAmount = item.querySelector('.donation-amount');
+                const donationDate = item.querySelector('.donation-date');
+                
+                donorName.textContent = donors[index];
+                donationAmount.textContent = amounts[index];
+                donationDate.textContent = dates[index];
+            });
+        }
+        
+        // Обновляем список при загрузке
+        document.addEventListener('DOMContentLoaded', updateDonationList);
+    </script>
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+

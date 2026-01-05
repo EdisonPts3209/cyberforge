@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статьи - КиберФордж</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.9);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.95);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas матрицы на заднем плане */
+        #matrixCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 255, 159, 0.1);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle, .back-to-home, .auth-btn {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .back-to-home {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-to-home:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .auth-btn {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-btn:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ===== ОСНОВНОЕ СОДЕРЖИМОЕ ===== */
+        main {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, #00ff9f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .page-title::after {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, var(--accent));
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+        }
+
+        /* Фильтры и поиск */
+        .articles-controls {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .search-articles {
+            margin-bottom: 25px;
+        }
+
+        .search-articles h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .article-search-input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .article-search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .article-search-container {
+            position: relative;
+        }
+
+        .article-search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .categories-filter {
+            margin-bottom: 10px;
+        }
+
+        .categories-filter h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .categories-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .category-btn:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .category-btn.active {
+            background-color: rgba(0, 255, 159, 0.15);
+            color: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        /* Лента статей */
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .article-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+        }
+
+        .article-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px var(--accent-glow);
+        }
+
+        .article-category {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .article-image {
+            height: 180px;
+            width: 100%;
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.1), rgba(0, 102, 255, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 3rem;
+        }
+
+        .article-content {
+            padding: 25px;
+        }
+
+        .article-header {
+            margin-bottom: 15px;
+        }
+
+        .article-title {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        .article-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .article-author img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid var(--accent);
+        }
+
+        .article-stats {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .article-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .article-preview {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .article-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .read-time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Пагинация */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .pagination-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-secondary);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pagination-btn:hover {
+            background-color: rgba(0, 255, 159, 0.1);
+            color: var(--accent);
+        }
+
+        .pagination-btn.active {
+            background-color: rgba(0, 255, 159, 0.15);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .pagination-ellipsis {
+            color: var(--text-secondary);
+        }
+
+        /* Плавающая кнопка */
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 999;
+            border: none;
+        }
+
+        .floating-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 25px var(--accent-glow);
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            border: 2px dashed rgba(0, 255, 159, 0.2);
+            margin: 40px 0;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto 25px;
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 40px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+        }
+
+        .light-theme footer {
+            background-color: rgba(245, 247, 250, 0.9);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНАЯ АДАПТАЦИЯ ===== */
+        @media (max-width: 992px) {
+            .page-title {
+                font-size: 2.5rem;
+            }
+            
+            .articles-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .page-title {
+                font-size: 2rem;
+            }
+            
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories-grid {
+                justify-content: center;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .back-to-home span,
+            .auth-btn span {
+                display: none;
+            }
+            
+            .back-to-home,
+            .auth-btn {
+                padding: 8px;
+            }
+            
+            .floating-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .articles-controls {
+                padding: 20px;
+            }
+            
+            .article-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas для матричного эффекта -->
+    <canvas id="matrixCanvas"></canvas>
+    
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="index.html" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск по платформе...">
+            </div>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Кнопка "На главную" -->
+                <a href="index.html" class="back-to-home">
+                    <i class="fas fa-home"></i>
+                    <span>На главную</span>
+                </a>
+                
+                <!-- Кнопка входа -->
+                <a href="login.html" class="auth-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Войти</span>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main class="container">
+        <!-- Заголовок страницы -->
+        <div class="page-header">
+            <h1 class="page-title">Статьи</h1>
+            <p class="page-subtitle">База знаний по кибербезопасности, программированию, ИИ и другим IT-направлениям. Все статьи проходят модерацию и верификацию.</p>
+        </div>
+        
+        <!-- Фильтры и поиск -->
+        <div class="articles-controls">
+            <!-- Поиск по статьям -->
+            <div class="search-articles">
+                <h3><i class="fas fa-search"></i> Поиск статей</h3>
+                <div class="article-search-container">
+                    <i class="fas fa-search article-search-icon"></i>
+                    <input type="text" class="article-search-input" id="articleSearch" placeholder="Введите ключевые слова, тему или автора...">
+                </div>
+            </div>
+            
+            <!-- Фильтры по категориям -->
+            <div class="categories-filter">
+                <h3><i class="fas fa-filter"></i> Категории</h3>
+                <div class="categories-grid" id="categoriesGrid">
+                    <button class="category-btn active" data-category="all">Все статьи</button>
+                    <button class="category-btn" data-category="cybersecurity">Кибербезопасность</button>
+                    <button class="category-btn" data-category="programming">Программирование</button>
+                    <button class="category-btn" data-category="ai">Искусственный интеллект</button>
+                    <button class="category-btn" data-category="law">Законодательство в IT</button>
+                    <button class="category-btn" data-category="anti-fraud">Противомошенничество</button>
+                    <button class="category-btn" data-category="networks">Сетевая безопасность</button>
+                    <button class="category-btn" data-category="guides">Практические руководства</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Лента статей -->
+        <div class="articles-grid" id="articlesGrid">
+            <!-- Статья 1 -->
+            <div class="article-card" data-category="cybersecurity">
+                <div class="article-category">Кибербезопасность</div>
+                <div class="article-image">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Основы криптографии для начинающих</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=12" alt="Автор">
+                                <span>Алексей Петров</span>
+                            </div>
+                            <div class="article-date">15 дек 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>2.4K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>42</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>128</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Понимание основ криптографии необходимо каждому, кто работает в IT. В этой статье мы разберем основные принципы шифрования, хэширования и цифровых подписей на практических примерах.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>12 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 2 -->
+            <div class="article-card" data-category="programming">
+                <div class="article-category">Программирование</div>
+                <div class="article-image">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Python для анализа безопасности</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=8" alt="Автор">
+                                <span>Мария Смирнова</span>
+                            </div>
+                            <div class="article-date">10 дек 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>3.1K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>56</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>201</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Использование Python для автоматизации задач кибербезопасности: сканирование портов, анализ логов, создание простых эксплойтов. Практические примеры с кодом.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>18 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 3 -->
+            <div class="article-card" data-category="ai">
+                <div class="article-category">Искусственный интеллект</div>
+                <div class="article-image">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">AI в обнаружении кибератак</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=3" alt="Автор">
+                                <span>Дмитрий Волков</span>
+                            </div>
+                            <div class="article-date">5 дек 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>4.2K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>89</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>312</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Как машинное обучение и нейронные сети помогают выявлять аномалии в сетевом трафике и предотвращать атаки до их реализации. Обзор современных решений и их эффективности.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>22 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 4 -->
+            <div class="article-card" data-category="law">
+                <div class="article-category">Законодательство в IT</div>
+                <div class="article-image">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">GDPR для IT-специалистов</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=11" alt="Автор">
+                                <span>Анна Ковалева</span>
+                            </div>
+                            <div class="article-date">28 ноя 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>1.8K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>34</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>97</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Практическое руководство по соблюдению GDPR для разработчиков и администраторов. Какие данные нужно защищать, как оформлять согласия и что делать при утечке.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>15 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 5 -->
+            <div class="article-card" data-category="anti-fraud">
+                <div class="article-category">Противомошенничество</div>
+                <div class="article-image">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Социальная инженерия: методы защиты</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=6" alt="Автор">
+                                <span>Игорь Семенов</span>
+                            </div>
+                            <div class="article-date">20 ноя 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>2.7K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>47</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>156</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Как мошенники получают доступ к данным через психологическое воздействие и как защитить себя и свою организацию от атак социальной инженерии.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>14 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 6 -->
+            <div class="article-card" data-category="cybersecurity">
+                <div class="article-category">Кибербезопасность</div>
+                <div class="article-image">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Безопасность веб-приложений: OWASP Top 10</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=15" alt="Автор">
+                                <span>Сергей Иванов</span>
+                            </div>
+                            <div class="article-date">15 ноя 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>3.5K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>62</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>245</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Разбор самых критичных уязвимостей веб-приложений по версии OWASP. Примеры эксплуатации и методы защиты от каждой из угроз.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>20 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 7 -->
+            <div class="article-card" data-category="networks">
+                <div class="article-category">Сетевая безопасность</div>
+                <div class="article-image">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Настройка VPN для удаленной работы</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=9" alt="Автор">
+                                <span>Ольга Новикова</span>
+                            </div>
+                            <div class="article-date">10 ноя 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>1.9K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>28</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>103</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Пошаговое руководство по настройке безопасного VPN-соединения для удаленных сотрудников. Сравнение протоколов и рекомендации по выбору решений.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>16 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 8 -->
+            <div class="article-card" data-category="guides">
+                <div class="article-category">Практические руководства</div>
+                <div class="article-image">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Создание домашней лаборатории для тестирования</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=5" alt="Автор">
+                                <span>Андрей Козлов</span>
+                            </div>
+                            <div class="article-date">5 ноя 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>2.2K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>41</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>134</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Как создать безопасную среду для тестирования уязвимостей и отработки навыков без риска для реальных систем. Обзор необходимого ПО и оборудования.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>25 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 9 -->
+            <div class="article-card" data-category="programming">
+                <div class="article-category">Программирование</div>
+                <div class="article-image">
+                    <i class="fas fa-terminal"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Безопасное программирование на C/C++</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=14" alt="Автор">
+                                <span>Владимир Соколов</span>
+                            </div>
+                            <div class="article-date">28 окт 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>2.9K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>53</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>187</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Избегаем распространенных уязвимостей: переполнение буфера, использование после освобождения, утечки памяти. Практические советы и примеры кода.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>19 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Статья 10 -->
+            <div class="article-card" data-category="ai">
+                <div class="article-category">Искусственный интеллект</div>
+                <div class="article-image">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="article-content">
+                    <div class="article-header">
+                        <h3 class="article-title">Этика в разработке AI-систем</h3>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <img src="https://i.pravatar.cc/150?img=7" alt="Автор">
+                                <span>Екатерина Морозова</span>
+                            </div>
+                            <div class="article-date">20 окт 2025</div>
+                        </div>
+                    </div>
+                    <div class="article-stats">
+                        <div class="article-stat">
+                            <i class="far fa-eye"></i>
+                            <span>1.5K</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-comment"></i>
+                            <span>39</span>
+                        </div>
+                        <div class="article-stat">
+                            <i class="far fa-heart"></i>
+                            <span>89</span>
+                        </div>
+                    </div>
+                    <p class="article-preview">Как избежать bias в алгоритмах, обеспечить прозрачность принятия решений и защитить приватность пользователей при разработке AI-систем.</p>
+                    <div class="article-footer">
+                        <div class="read-time">
+                            <i class="far fa-clock"></i>
+                            <span>17 мин</span>
+                        </div>
+                        <button class="btn btn-small read-article-btn">Читать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Пагинация -->
+        <div class="pagination">
+            <button class="pagination-btn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <span class="pagination-ellipsis">...</span>
+            <button class="pagination-btn">8</button>
+            <button class="pagination-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <!-- Пустое состояние (скрыто по умолчанию) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-newspaper"></i>
+            <h3>Статьи не найдены</h3>
+            <p>По вашему запросу не найдено ни одной статьи. Попробуйте изменить параметры поиска или выбрать другую категорию.</p>
+            <button class="btn" id="resetFiltersBtn">
+                <i class="fas fa-redo"></i> Сбросить фильтры
+            </button>
+        </div>
+        
+        <!-- Плавающая кнопка "Новая статья" -->
+        <button class="floating-btn" id="newArticleBtn">
+            <i class="fas fa-plus"></i>
+        </button>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Статьи и материалы</h3>
+                    <ul>
+                        <li><a href="articles.html">Все статьи</a></li>
+                        <li><a href="#">Популярное</a></li>
+                        <li><a href="#">Новое</a></li>
+                        <li><a href="#">Для начинающих</a></li>
+                        <li><a href="#">Для экспертов</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Платформа</h3>
+                    <ul>
+                        <li><a href="index.html">Главная</a></li>
+                        <li><a href="about.html">О проекте</a></li>
+                        <li><a href="rules.html">Правила</a></li>
+                        <li><a href="privacy.html">Конфиденциальность</a></li>
+                        <li><a href="register.html">Стать автором</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023-2026 КиберФордж. Все права защищены.</p>
+                <p><small>Все статьи проходят модерацию и проверку качества. Платформа поддерживает только качественный и проверенный контент.</small></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // Инициализация матричной анимации
+            initMatrixAnimation();
+        });
+        
+        // ===== МАТРИЧНАЯ АНИМАЦИЯ НА CANVAS =====
+        function initMatrixAnimation() {
+            const canvas = document.getElementById('matrixCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Устанавливаем размер canvas
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            // Символы матрицы
+            const matrixChars = '01📰📖📚📑📄📃📊📈📉🔍🔎✍️🖋️📝ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~';
+            const chars = matrixChars.split('');
+            
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            
+            // Массив для отслежиния позиции капли по каждому столбцу
+            const drops = [];
+            
+            // Инициализируем капли
+            for (let i = 0; i < columns; i++) {
+                drops[i] = Math.floor(Math.random() * canvas.height / fontSize);
+            }
+            
+            // Функция отрисовки
+            function draw() {
+                // Полупрозрачный черный фон для эффекта следа
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Цвет символов
+                ctx.fillStyle = '#00ff9f';
+                ctx.font = `${fontSize}px 'Courier New', monospace`;
+                
+                // Отрисовка символов
+                for (let i = 0; i < drops.length; i++) {
+                    // Случайный символ
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    
+                    // Рандомная яркость
+                    const brightness = 0.1 + Math.random() * 0.5;
+                    
+                    // Рисуем символ
+                    ctx.fillStyle = `rgba(0, 255, 159, ${brightness})`;
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    // Если капля достигла низа или случайно, сбрасываем её
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    
+                    // Перемещаем каплю вниз
+                    drops[i]++;
+                }
+            }
+            
+            // Запускаем анимацию
+            function animate() {
+                draw();
+                requestAnimationFrame(animate);
+            }
+            
+            // Обработчик изменения размера окна
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+            
+            // Запускаем анимацию
+            animate();
+        }
+        
+        // ===== ФИЛЬТРАЦИЯ СТАТЕЙ ПО КАТЕГОРИЯМ =====
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const articlesGrid = document.getElementById('articlesGrid');
+        const articleCards = document.querySelectorAll('.article-card');
+        const emptyState = document.getElementById('emptyState');
+        
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Снимаем активный класс со всех кнопок
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                // Добавляем активный класс нажатой кнопке
+                this.classList.add('active');
+                
+                const category = this.getAttribute('data-category');
+                filterArticles(category);
+            });
+        });
+        
+        function filterArticles(category) {
+            let visibleCount = 0;
+            
+            articleCards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                
+                if (category === 'all' || cardCategory === category) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Показываем/скрываем пустое состояние
+            if (visibleCount === 0) {
+                emptyState.style.display = 'block';
+                articlesGrid.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                articlesGrid.style.display = 'grid';
+            }
+        }
+        
+        // ===== ПОИСК ПО СТАТЬЯМ =====
+        const articleSearch = document.getElementById('articleSearch');
+        articleSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            let visibleCount = 0;
+            
+            articleCards.forEach(card => {
+                const title = card.querySelector('.article-title').textContent.toLowerCase();
+                const preview = card.querySelector('.article-preview').textContent.toLowerCase();
+                const author = card.querySelector('.article-author span').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || preview.includes(searchTerm) || author.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Показываем/скрываем пустое состояние
+            if (visibleCount === 0 && searchTerm !== '') {
+                emptyState.style.display = 'block';
+                articlesGrid.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                articlesGrid.style.display = 'grid';
+            }
+        });
+        
+        // ===== КНОПКА СБРОСА ФИЛЬТРОВ =====
+        const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+        resetFiltersBtn.addEventListener('click', function() {
+            // Сброс фильтров категорий
+            categoryBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-category') === 'all') {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Сброс поиска
+            articleSearch.value = '';
+            
+            // Показ всех статей
+            filterArticles('all');
+        });
+        
+        // ===== КНОПКА "ЧИТАТЬ" =====
+        const readArticleBtns = document.querySelectorAll('.read-article-btn');
+        readArticleBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const articleTitle = this.closest('.article-card').querySelector('.article-title').textContent;
+                alert(`Функция чтения статьи "${articleTitle}" будет доступна после регистрации на платформе.`);
+            });
+        });
+        
+        // ===== ПЛАВАЮЩАЯ КНОПКА "НОВАЯ СТАТЬЯ" =====
+        const newArticleBtn = document.getElementById('newArticleBtn');
+        newArticleBtn.addEventListener('click', function() {
+            alert('Функция создания новой статьи доступна только авторам платформы. Чтобы стать автором, необходимо зарегистрироваться и подать заявку на получение статуса автора.');
+        });
+        
+        // ===== ПАГИНАЦИЯ =====
+        const paginationBtns = document.querySelectorAll('.pagination-btn:not(:first-child):not(:last-child)');
+        paginationBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                paginationBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                alert('Пагинация будет реализована в следующих версиях платформы.');
+            });
+        });
+    </script>
+    
+    <!-- JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+
