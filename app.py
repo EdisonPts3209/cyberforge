@@ -209,5 +209,62 @@ def not_found(error):
 def forbidden(error):
     return render_template('403.html'), 403
 
+@app.route('/articles')
+def articles():
+    return render_template('articles.html')
+
+@app.route('/classes')
+def classes():
+    return render_template('classes.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+@app.route('/rules')
+def rules():
+    return render_template('rules.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+@app.route('/support')
+def support():
+    return render_template('support.html')
+
+@app.route('/terms')
+def terms():
+    return render_template('terms.html')
+
+@app.route('/for-authors')
+def for_authors():
+    return render_template('for-authors.html')
+
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
+
+# Защищённые страницы
+@app.route('/new-article')
+@login_required
+def new_article():
+    return render_template('new-article.html')
+
+@app.route('/new-class')
+@login_required
+def new_class():
+    return render_template('new-class.html')
+
+@app.route('/certificate-create')
+@login_required
+def certificate_create():
+    return render_template('certificate-create.html')
+
+@app.route('/profile/<username>')
+def profile(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    return render_template('profile.html', profile_user=user)
+
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=5000)
