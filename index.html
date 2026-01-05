@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КиберФордж - Кузница киберспециалистов</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS СБРОС И БАЗОВЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-bg: #0a0a0f;
+            --secondary-bg: #11111f;
+            --card-bg: #161622;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0c0;
+            --accent: #00ff9f;
+            --accent-dark: #00cc7a;
+            --accent-glow: rgba(0, 255, 159, 0.3);
+            --danger: #ff4757;
+            --header-bg: rgba(10, 10, 15, 0.85);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+        }
+
+        .light-theme {
+            --primary-bg: #f5f7fa;
+            --secondary-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #222233;
+            --text-secondary: #555566;
+            --accent: #00cc7a;
+            --accent-dark: #00995c;
+            --accent-glow: rgba(0, 204, 122, 0.2);
+            --header-bg: rgba(245, 247, 250, 0.92);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(1200px circle at 20% 10%, rgba(120, 180, 255, 0.14), transparent 40%),
+                radial-gradient(1000px circle at 80% 20%, rgba(180, 120, 255, 0.12), transparent 45%),
+                radial-gradient(900px circle at 50% 80%, rgba(120, 255, 200, 0.12), transparent 50%),
+                linear-gradient(180deg, #0b0f1a 0%, #05070c 100%);
+            color: var(--text-primary);
+            transition: background 0.25s ease, color 0.2s ease;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .light-theme body {
+            background:
+                radial-gradient(1200px circle at 20% 10%, rgba(120, 180, 255, 0.08), transparent 40%),
+                radial-gradient(1000px circle at 80% 20%, rgba(180, 120, 255, 0.06), transparent 45%),
+                radial-gradient(900px circle at 50% 80%, rgba(120, 255, 200, 0.06), transparent 50%),
+                linear-gradient(180deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #000;
+            font-weight: 700;
+            border-radius: var(--border-radius);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--accent-glow);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        /* ===== ШАПКА ===== */
+        header {
+            
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background-color: var(--header-bg);
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+        }
+
+        .search-container {
+            flex: 0 1 500px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            background-color: var(--secondary-bg);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-toggle, .notification-icon, .avatar {
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--card-bg);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .notification-icon {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            border: 1px solid rgba(0, 255, 159, 0.1);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--header-bg);
+        }
+
+        .avatar img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .avatar:hover img {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* ===== ВЫПАДАЮЩИЕ МЕНЮ ===== */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background-color: var(--secondary-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 280px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            z-index: 1001;
+        }
+
+        .dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(0, 255, 159, 0.1);
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .dropdown-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(0, 255, 159, 0.05);
+            color: var(--accent);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .notification-dropdown {
+            right: -10px;
+        }
+
+        .avatar-dropdown {
+            right: 0;
+        }
+
+        /* ===== ГЕРОЙ СЕКЦИЯ ===== */
+        .hero {
+            height: 80vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+            background: radial-gradient(circle at 30% 20%, rgba(0, 255, 159, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(0, 102, 255, 0.05) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 0 20px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--accent), #00e6ff, #00ff9f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.1;
+            text-shadow: 0 5px 15px rgba(0, 255, 159, 0.2);
+        }
+
+        .hero .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero .btn {
+            font-size: 1.1rem;
+            padding: 15px 40px;
+            border-radius: var(--border-radius);
+        }
+
+        .matrix-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .code-line {
+            position: absolute;
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            white-space: nowrap;
+            text-shadow: 0 0 5px var(--accent);
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            from { transform: translateY(-100px); }
+            to { transform: translateY(100vh); }
+        }
+
+        /* ===== КАТЕГОРИИ ===== */
+        .categories {
+            padding: 80px 0;
+            background-color: transparent;
+            position: relative;
+        }
+
+        .categories::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 7, 12, 0.7);
+            z-index: 0;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .category-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            transition: var(--transition);
+            border: 1px solid rgba(0, 255, 159, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 25px var(--accent-glow);
+        }
+
+        .category-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.1), rgba(0, 102, 255, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .category-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* ===== ФУТЕР ===== */
+        footer {
+            background-color: rgba(5, 7, 12, 0.9);
+            padding: 50px 0 20px;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            position: relative;
+        }
+
+        .light-theme footer {
+            background-color: rgba(245, 247, 250, 0.9);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, var(--accent), #00e6ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .footer-links {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .footer-links h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+
+        .footer-links ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .social-icon:hover {
+            background-color: var(--accent);
+            color: #000;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* ===== МОБИЛЬНОЕ МЕНЮ ===== */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(5, 7, 12, 0.95);
+            padding: 10px 0;
+            border-top: 1px solid rgba(0, 255, 159, 0.1);
+            z-index: 999;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .light-theme .mobile-bottom-nav {
+            background-color: rgba(245, 247, 250, 0.95);
+        }
+
+        .mobile-nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            padding: 8px 15px;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+
+        .mobile-nav-item.active,
+        .mobile-nav-item:hover {
+            color: var(--accent);
+            background-color: rgba(0, 255, 159, 0.05);
+        }
+
+        .mobile-nav-item i {
+            font-size: 1.2rem;
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+            
+            .search-container {
+                flex: 0 1 350px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 15px;
+            }
+            
+            .search-container {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .header-right .theme-toggle,
+            .header-right .notification-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .mobile-bottom-nav {
+                display: block;
+            }
+            
+            footer {
+                padding-bottom: 70px;
+            }
+            
+            .dropdown {
+                width: 250px;
+                right: -15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .header-content {
+                padding: 0 10px;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .hero {
+                min-height: 500px;
+                height: 70vh;
+            }
+        }
+
+        /* ===== УТИЛИТЫ ===== */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <header>
+        <div class="header-content">
+            <!-- Логотип -->
+            <a href="#" class="logo">
+                <i class="fas fa-hammer logo-icon"></i>
+                <span>КиберФордж</span>
+            </a>
+            
+            <!-- Поиск -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" placeholder="Поиск курсов, статей...">
+            </div>
+            
+            <nav class="main-nav" style="display: flex; justify-content: center; gap: 30px; margin: 0 20px;">
+                <a href="/" style="color: var(--accent); font-weight: bold;">Главная</a>
+                <a href="/articles" style="color: var(--text-primary);">Статьи</a>
+                <a href="/classes" style="color: var(--text-primary);">Классы</a>
+                <a href="/about" style="color: var(--text-primary);">О проекте</a>
+                <a href="/rules" style="color: var(--text-primary);">Правила</a>
+                <a href="/privacy" style="color: var(--text-primary);">Политика</a>
+                <a href="/support" style="color: var(--text-primary);">Поддержать</a>
+                <a href="/for-authors" style="color: var(--text-primary);">Для авторов</a>
+            </nav>
+            
+            <!-- Правая часть шапки -->
+            <div class="header-right">
+                <!-- Переключатель темы -->
+                <div class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </div>
+                
+                <!-- Уведомления -->
+                <div class="notification-icon" id="notificationIcon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                    <!-- Выпадающее меню уведомлений -->
+                    <div class="dropdown notification-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-bell"></i> Уведомления
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-book"></i>
+                            <span>Новый курс по кибербезопасности доступен</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Ваш сертификат готов к выдаче</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-comment"></i>
+                            <span>Новый комментарий в вашей статье</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Завтра вебинар по теме "AI в cybersecurity"</span>
+                        </div>
+                        <div class="dropdown-item">
+                            <i class="fas fa-eye"></i>
+                            <span>Показать все уведомления</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Аватар и меню пользователя -->
+                <div class="avatar" id="avatar">
+                    <img src="https://i.pravatar.cc/150?img=32" alt="Аватар пользователя">
+                    <!-- Выпадающее меню пользователя -->
+                    <div class="dropdown avatar-dropdown">
+                        <div class="dropdown-header">
+                            <i class="fas fa-user"></i> Алексей Киберов
+                        </div>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Мой профиль</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-newspaper"></i>
+                            <span>Мои статьи</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-users"></i>
+                            <span>Мои классы</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-certificate"></i>
+                            <span>Мои сертификаты</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Настройки</span>
+                        </a>
+                        <div class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Выход</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Основное содержимое -->
+    <main>
+        <!-- Герой-секция -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>КиберФордж</h1>
+                <p class="subtitle">Кузница настоящих киберспециалистов</p>
+                <button class="btn" id="startLearningBtn">Начать обучение</button>
+            </div>
+            
+            <!-- Анимация матрицы -->
+            <div class="matrix-animation" id="matrixAnimation"></div>
+        </section>
+        
+        <!-- Секция категорий -->
+        <section class="categories container">
+            <h2 class="section-title">Категории обучения</h2>
+            <div class="categories-grid">
+                <!-- Карточка 1 -->
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="category-title">Кибербезопасность</h3>
+                    <p class="category-desc">Защита систем, сетей и данных от кибератак. Изучите методы защиты и принципы информационной безопасности.</p>
+                </div>
+                
+                <!-- Карточка 2 -->
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="category-title">Программирование</h3>
+                    <p class="category-desc">Разработка безопасного кода, анализ уязвимостей, создание инструментов для тестирования на проникновение.</p>
+                </div>
+                
+                <!-- Карточка 3 -->
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="category-title">Искусственный интеллект</h3>
+                    <p class="category-desc">Использование AI для обнаружения угроз, анализ больших данных, машинное обучение в кибербезопасности.</p>
+                </div>
+                
+                <!-- Карточка 4 -->
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <h3 class="category-title">Законодательство в IT</h3>
+                    <p class="category-desc">Правовые аспекты информационной безопасности, GDPR, compliance и нормативные требования.</p>
+                </div>
+                
+                <!-- Карточка 5 -->
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-user-secret"></i>
+                    </div>
+                    <h3 class="category-title">Противомошенничество</h3>
+                    <p class="category-desc">Методы выявления и предотвращения мошеннических схем, социальная инженерия, фишинг и защита от них.</p>
+                </div>
+                
+                <!-- Карточка 6 -->
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3 class="category-title">Сетевая безопасность</h3>
+                    <p class="category-desc">Защита сетевой инфраструктуры, анализ трафика, VPN, firewall и системы обнаружения вторжений.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Футер -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">КиберФордж</div>
+                    <p>Образовательная платформа для подготовки специалистов в области кибербезопасности и IT. Мы создаем будущих экспертов, способных противостоять современным киберугрозам.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon"><i class="fab fa-vk"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-telegram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Быстрые ссылки</h3>
+                    <ul>
+                        <li><a href="#">О платформе</a></li>
+                        <li><a href="#">Преподаватели</a></li>
+                        <li><a href="#">Курсы</a></li>
+                        <li><a href="#">Статьи</a></li>
+                        <li><a href="#">Сертификация</a></li>
+                        <li><a href="#">Поддержка</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-links">
+                    <h3>Контакты</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@cyberforge.red1dark.ru</li>
+                        <li><i class="fas fa-phone"></i> +7 (XXX) XXX-XX-XX</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Россия, Москва</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 КиберФордж. Все права защищены. <a href="#" style="color: var(--accent);">Политика конфиденциальности</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Мобильное нижнее меню -->
+    <nav class="mobile-bottom-nav">
+        <div class="mobile-nav-items">
+            <a href="#" class="mobile-nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+            </a>
+            <a href="#" class="mobile-nav-item">
+                <i class="fas fa-newspaper"></i>
+                <span>Статьи</span>
+            </a>
+            <a href="#" class="mobile-nav-item">
+                <i class="fas fa-users"></i>
+                <span>Классы</span>
+            </a>
+            <a href="#" class="mobile-nav-item search-mobile">
+                <i class="fas fa-search"></i>
+                <span>Поиск</span>
+            </a>
+            <a href="#" class="mobile-nav-item">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        // ===== ПЕРЕКЛЮЧЕНИЕ ТЕМЫ =====
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            
+            if (document.body.classList.contains('light-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Проверка сохраненной темы при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+            
+            // Инициализация матричной анимации
+            initMatrixAnimation();
+        });
+        
+        // ===== ВЫПАДАЮЩИЕ МЕНЮ =====
+        const notificationIcon = document.getElementById('notificationIcon');
+        const avatar = document.getElementById('avatar');
+        const notificationDropdown = notificationIcon.querySelector('.dropdown');
+        const avatarDropdown = avatar.querySelector('.dropdown');
+        
+        // Открытие/закрытие меню уведомлений
+        notificationIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Открытие/закрытие меню пользователя
+        avatar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarDropdown.classList.toggle('active');
+            notificationDropdown.classList.remove('active');
+        });
+        
+        // Закрытие всех меню при клике вне их
+        document.addEventListener('click', () => {
+            notificationDropdown.classList.remove('active');
+            avatarDropdown.classList.remove('active');
+        });
+        
+        // Предотвращение закрытия при клике внутри меню
+        notificationDropdown.addEventListener('click', (e) => e.stopPropagation());
+        avatarDropdown.addEventListener('click', (e) => e.stopPropagation());
+        
+        // ===== МАТРИЧНАЯ АНИМАЦИЯ =====
+        function initMatrixAnimation() {
+            const matrixContainer = document.getElementById('matrixAnimation');
+            const characters = '01abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$+-*/=%"\'#&_(),.;:?!\\|{}<>[]^~';
+            
+            // Создаем 30 строк кода
+            for (let i = 0; i < 30; i++) {
+                const codeLine = document.createElement('div');
+                codeLine.className = 'code-line';
+                
+                // Случайная горизонтальная позиция
+                const left = Math.random() * 100;
+                codeLine.style.left = `${left}%`;
+                
+                // Случайная задержка анимации
+                const delay = Math.random() * 5;
+                codeLine.style.animationDelay = `${delay}s`;
+                
+                // Случайная продолжительность анимации
+                const duration = 5 + Math.random() * 10;
+                codeLine.style.animationDuration = `${duration}s`;
+                
+                // Случайная длина строки
+                const lineLength = 10 + Math.floor(Math.random() * 20);
+                let lineText = '';
+                
+                // Генерация случайного текста
+                for (let j = 0; j < lineLength; j++) {
+                    const randomChar = characters[Math.floor(Math.random() * characters.length)];
+                    lineText += randomChar;
+                }
+                
+                codeLine.textContent = lineText;
+                
+                // Случайная прозрачность
+                const opacity = 0.2 + Math.random() * 0.5;
+                codeLine.style.opacity = opacity;
+                
+                matrixContainer.appendChild(codeLine);
+            }
+        }
+        
+        // ===== КНОПКА "НАЧАТЬ ОБУЧЕНИЕ" =====
+        const startLearningBtn = document.getElementById('startLearningBtn');
+        startLearningBtn.addEventListener('click', () => {
+            alert('Приветствуем в КиберФордж! Скоро вы будете перенаправлены на страницу выбора курса.');
+            // В реальном проекте здесь был бы переход на страницу регистрации/выбора курса
+        });
+        
+        // ===== МОБИЛЬНЫЙ ПОИСК =====
+        const searchMobileBtn = document.querySelector('.search-mobile');
+        searchMobileBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const searchInput = document.querySelector('.search-input');
+            searchInput.focus();
+            searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+        
+        // ===== АКТИВНЫЙ ПУНКТ МОБИЛЬНОГО МЕНЮ =====
+        const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+        mobileNavItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (this.classList.contains('search-mobile')) return;
+                
+                e.preventDefault();
+                mobileNavItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html> 
